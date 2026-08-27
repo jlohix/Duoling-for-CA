@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { questionsForSkip, isAnswerCorrect } from "../data/loadQuestions";
 import { TOPICS } from "../data/topics";
 import {
@@ -8,12 +8,17 @@ import {
   addXp,
   unlockTopicBySkip,
   visibleStreak,
+  wouldExtendStreak,
+  recordFirstTry,
 } from "../state/progress";
 import { useQuizQueue } from "../hooks/useQuizQueue";
 import QuestionCard from "../components/QuestionCard";
 import ReviewGate from "../components/ReviewGate";
 import StreakChip from "../components/StreakChip";
 import FeedbackBanner from "../components/FeedbackBanner";
+import CloseWarning from "../components/CloseWarning";
+import ThemeSwitch from "../components/ThemeSwitch";
+import HintControl from "../components/HintControl";
 
 export default function SkipQuiz({
   allQuestions,
@@ -28,6 +33,7 @@ export default function SkipQuiz({
     [allQuestions, targetTopicId]
   );
   const quiz = useQuizQueue(initial);
+  const [leaveOpen, setLeaveOpen] = useState(false);
 
   const target = TOPICS.find((t) => t.id === targetTopicId);
   const sourceNames = TOPICS.filter((t) => t.id < targetTopicId)
@@ -37,6 +43,8 @@ export default function SkipQuiz({
 
   function finish() {
     const passed = quiz.firstPassCorrect >= needed;
+    const grew = passed && wouldExtendStreak(progress);
+    const streakFrom = visibleStreak(progress);
     let next = progress;
     if (passed) {
       setProgress((p) => {
@@ -52,6 +60,8 @@ export default function SkipQuiz({
       needed,
       xpGained: passed ? quiz.xpGained + 20 : quiz.xpGained,
       streak: visibleStreak(next),
+      streakFrom,
+      streakGrew: grew,
       topicName: target?.name,
       difficultyName: "Skip quiz",
     });
@@ -80,13 +90,14 @@ export default function SkipQuiz({
   return (
     <div className="page lesson">
       <header className="lesson-bar">
-        <button type="button" className="ghost" onClick={onExit}>
+        <button type="button" className="ghost" onClick={() => setLeaveOpen(true)}>
           Close
         </button>
         <div className="meter">
           <div className="meter-fill" style={{ width: `${meter}%` }} />
         </div>
         <StreakChip progress={progress} />
+        <ThemeSwitch compact />
       </header>
       <p className="lesson-meta">
         Skip to {target?.name} · Get {needed}/{quiz.originalTotal} first try ·{" "}
@@ -104,16 +115,27 @@ export default function SkipQuiz({
             onSelect={quiz.setSelected}
           />
           {!quiz.revealed ? (
-            <button
-              type="button"
-              className="primary check"
-              disabled={!quiz.selected}
-              onClick={() =>
-                quiz.check(() => setProgress((p) => addXp(p, XP_CORRECT)))
-              }
-            >
-              Check
-            </button>
+            <div className="quiz-actions">
+              <HintControl question={quiz.question} />
+              <button
+                type="button"
+                className="primary check"
+                disabled={!quiz.selected}
+                onClick={() =>
+                  quiz.check(({ ok, firstTry, awardXp, question }) => {
+                    setProgress((p) => {
+                      let next = p;
+                      if (awardXp) next = addXp(next, XP_CORRECT);
+                      if (firstTry)
+                        next = recordFirstTry(next, question.topicId, ok);
+                      return next;
+                    });
+                  })
+                }
+              >
+                Check
+              </button>
+            </div>
           ) : (
             <FeedbackBanner
               correct={isAnswerCorrect(quiz.question, quiz.selected)}
@@ -127,6 +149,11 @@ export default function SkipQuiz({
           )}
         </>
       )}
+      <CloseWarning
+        open={leaveOpen}
+        onStay={() => setLeaveOpen(false)}
+        onLeave={onExit}
+      />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { isAnswerCorrect } from "../data/loadQuestions";
 import { XP_CORRECT } from "../state/progress";
 
-export function useQuizQueue(initialQuestions) {
+export function useQuizQueue(initialQuestions, xpPerCorrect = XP_CORRECT) {
   const [queue, setQueue] = useState(initialQuestions);
   const originalTotal = initialQuestions.length;
   const [index, setIndex] = useState(0);
@@ -18,19 +18,19 @@ export function useQuizQueue(initialQuestions) {
 
   const question = queue[index];
 
-  function check(onXp) {
+  function check(onOutcome) {
     if (!selected || revealed || !question) return;
     const ok = isAnswerCorrect(question, selected);
     const firstTry = !attemptedIds.has(question.id);
+    const awardXp = ok && !solvedIds.has(question.id);
     setAttemptedIds((ids) => new Set(ids).add(question.id));
     setRevealed(true);
-    if (!ok) return;
-    if (firstTry) setFirstPassCorrect((n) => n + 1);
-    if (!solvedIds.has(question.id)) {
+    if (firstTry && ok) setFirstPassCorrect((n) => n + 1);
+    if (awardXp) {
       setSolvedIds((ids) => new Set(ids).add(question.id));
-      setXpGained((n) => n + XP_CORRECT);
-      onXp?.();
+      setXpGained((n) => n + xpPerCorrect);
     }
+    onOutcome?.({ ok, firstTry, awardXp, question });
   }
 
   function goNext() {

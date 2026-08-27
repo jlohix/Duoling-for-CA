@@ -4,6 +4,7 @@ import "katex/dist/katex.min.css";
 import "./index.css";
 import App from "./App.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
+import { ThemeProvider } from "./state/theme.jsx";
 
 const root = document.getElementById("root");
 
@@ -18,7 +19,9 @@ if (window.location.protocol === "file:") {
   createRoot(root).render(
     <StrictMode>
       <ErrorBoundary>
-        <App />
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
       </ErrorBoundary>
     </StrictMode>
   );
