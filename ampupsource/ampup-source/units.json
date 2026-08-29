@@ -1,0 +1,354 @@
+[
+ {
+  "id": "t1",
+  "topicId": "1",
+  "name": "Basic Laws",
+  "icon": "\u26a1",
+  "blurb": "Ohm's Law, KCL, KVL, Thevenin & Norton",
+  "lessons": [
+   {
+    "id": "t1-d1-0",
+    "label": "Easy 1",
+    "icon": "\ud83c\udf31",
+    "questionIds": [
+     "101",
+     "102",
+     "103",
+     "104",
+     "105",
+     "106",
+     "107",
+     "108"
+    ]
+   },
+   {
+    "id": "t1-d1-1",
+    "label": "Easy 2",
+    "icon": "\ud83c\udf31",
+    "questionIds": [
+     "109",
+     "110",
+     "111"
+    ]
+   },
+   {
+    "id": "t1-d2-0",
+    "label": "Medium 1",
+    "icon": "\ud83d\udd25",
+    "questionIds": [
+     "112",
+     "113",
+     "114",
+     "115",
+     "116",
+     "117",
+     "118",
+     "119"
+    ]
+   },
+   {
+    "id": "t1-d2-1",
+    "label": "Medium 2",
+    "icon": "\ud83d\udd25",
+    "questionIds": [
+     "120",
+     "121",
+     "122",
+     "123"
+    ]
+   },
+   {
+    "id": "t1-d3-0",
+    "label": "Challenging",
+    "icon": "\ud83d\udc8e",
+    "questionIds": [
+     "124",
+     "126",
+     "127",
+     "128"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "t2",
+  "topicId": "2",
+  "name": "Energy Storage Elements",
+  "icon": "\ud83d\udd0b",
+  "blurb": "Capacitors, inductors, stored energy",
+  "lessons": [
+   {
+    "id": "t2-d1-0",
+    "label": "Easy",
+    "icon": "\ud83c\udf31",
+    "questionIds": [
+     "201",
+     "202",
+     "203",
+     "204",
+     "205"
+    ]
+   },
+   {
+    "id": "t2-d2-0",
+    "label": "Medium 1",
+    "icon": "\ud83d\udd25",
+    "questionIds": [
+     "206",
+     "207",
+     "208",
+     "209",
+     "210",
+     "211",
+     "212",
+     "213"
+    ]
+   },
+   {
+    "id": "t2-d2-1",
+    "label": "Medium 2",
+    "icon": "\ud83d\udd25",
+    "questionIds": [
+     "214",
+     "215",
+     "216",
+     "217"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "t3",
+  "topicId": "3",
+  "name": "First & Second Order Circuits",
+  "icon": "\u23f1\ufe0f",
+  "blurb": "RC/RL transients, RLC damping, phasors",
+  "lessons": [
+   {
+    "id": "t3-d1-0",
+    "label": "Easy",
+    "icon": "\ud83c\udf31",
+    "questionIds": [
+     "313",
+     "314"
+    ]
+   },
+   {
+    "id": "t3-d2-0",
+    "label": "Medium 1",
+    "icon": "\ud83d\udd25",
+    "questionIds": [
+     "301",
+     "302",
+     "303",
+     "304",
+     "305",
+     "306",
+     "307",
+     "308"
+    ]
+   },
+   {
+    "id": "t3-d2-1",
+    "label": "Medium 2",
+    "icon": "\ud83d\udd25",
+    "questionIds": [
+     "309",
+     "310",
+     "311",
+     "312",
+     "315",
+     "316",
+     "317",
+     "318"
+    ]
+   },
+   {
+    "id": "t3-d2-2",
+    "label": "Medium 3",
+    "icon": "\ud83d\udd25",
+    "questionIds": [
+     "319",
+     "320"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "t4",
+  "topicId": "4",
+  "name": "Operational Amplifiers",
+  "icon": "\ud83d\udd3a",
+  "blurb": "Ideal op-amps, inverting & non-inverting gain",
+  "lessons": [
+   {
+    "id": "t4-d2-0",
+    "label": "Medium 1",
+    "icon": "\ud83d\udd25",
+    "questionIds": [
+     "401",
+     "402",
+     "403",
+     "404",
+     "405",
+     "406",
+     "407",
+     "408"
+    ]
+   },
+   {
+    "id": "t4-d2-1",
+    "label": "Medium 2",
+    "icon": "\ud83d\udd25",
+    "questionIds": [
+     "409",
+     "410",
+     "411",
+     "412",
+     "413",
+     "414",
+     "415",
+     "416"
+    ]
+   },
+   {
+    "id": "t4-d2-2",
+    "label": "Medium 3",
+    "icon": "\ud83d\udd25",
+    "questionIds": [
+     "417",
+     "418",
+     "419",
+     "420"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "t5",
+  "topicId": "5",
+  "name": "Laplace Transforms",
+  "icon": "\ud83c\udf00",
+  "blurb": "s-domain analysis of circuits",
+  "lessons": [
+   {
+    "id": "t5-d1-0",
+    "label": "Easy",
+    "icon": "\ud83c\udf31",
+    "questionIds": [
+     "502",
+     "503",
+     "504",
+     "505"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "t6",
+  "topicId": "6",
+  "name": "Transfer Functions",
+  "icon": "\ud83d\udd17",
+  "blurb": "H(s), poles/zeros, and two-port network parameters",
+  "lessons": [
+   {
+    "id": "t6-d2-0",
+    "label": "Medium 1",
+    "icon": "\ud83d\udd25",
+    "questionIds": [
+     "601",
+     "602",
+     "603",
+     "604",
+     "605",
+     "606",
+     "607",
+     "608"
+    ]
+   },
+   {
+    "id": "t6-d2-1",
+    "label": "Medium 2",
+    "icon": "\ud83d\udd25",
+    "questionIds": [
+     "609",
+     "610",
+     "611",
+     "612",
+     "613",
+     "614",
+     "615",
+     "616"
+    ]
+   },
+   {
+    "id": "t6-d2-2",
+    "label": "Medium 3",
+    "icon": "\ud83d\udd25",
+    "questionIds": [
+     "617",
+     "618",
+     "619",
+     "620"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "t7",
+  "topicId": "7",
+  "name": "AC Steady-State Analysis",
+  "icon": "\u3030\ufe0f",
+  "blurb": "Phasors, RMS, mixed DC/AC sources",
+  "lessons": [
+   {
+    "id": "t7-d1-0",
+    "label": "Easy",
+    "icon": "\ud83c\udf31",
+    "questionIds": [
+     "704",
+     "707",
+     "709",
+     "711",
+     "716",
+     "717",
+     "720"
+    ]
+   },
+   {
+    "id": "t7-d2-0",
+    "label": "Medium 1",
+    "icon": "\ud83d\udd25",
+    "questionIds": [
+     "701",
+     "702",
+     "703",
+     "705",
+     "706",
+     "708",
+     "710",
+     "712"
+    ]
+   },
+   {
+    "id": "t7-d2-1",
+    "label": "Medium 2",
+    "icon": "\ud83d\udd25",
+    "questionIds": [
+     "713",
+     "718"
+    ]
+   },
+   {
+    "id": "t7-d3-0",
+    "label": "Challenging",
+    "icon": "\ud83d\udc8e",
+    "questionIds": [
+     "714",
+     "715",
+     "719"
+    ]
+   }
+  ]
+ }
+]
