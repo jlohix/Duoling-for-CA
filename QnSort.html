@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Updated Question Bank Manager — Duoling for CA</title>
+  <meta name="description" content="AI-powered Question Bank Manager with ChatGPT screenshot auto-fill, multi-part splitting, KaTeX math, and GitHub integration">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- KaTeX CSS & JS for rendering LaTeX Math -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <!-- Ambient Background -->
+  <div class="ambient-bg">
+    <div class="ambient-orb ambient-orb-1"></div>
+    <div class="ambient-orb ambient-orb-2"></div>
+    <div class="ambient-orb ambient-orb-3"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="logo-group">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Updated Question Bank Manager</h1>
+          <p class="header-subtitle">Duoling for CA · Circuit Analysis (AI Vision & KaTeX Enabled)</p>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <button id="btn-api-key" class="btn btn-glass" title="Set Gemini API Key">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <path d="M21 2l-2 2m-2-2l2 2M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+          <span id="api-key-status-text">Set API Key</span>
+        </button>
+
+        <button id="btn-import-csv" class="btn btn-secondary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Import CSV
+        </button>
+        <input type="file" id="csv-import-input" accept=".csv" style="display: none;">
+
+        <button id="btn-download-csv" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Download CSV
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-main">
+    
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-label">Total Questions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-with-images">0</div>
+        <div class="stat-label">With Images</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-topics">0</div>
+        <div class="stat-label">Topics</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-difficulty">1.0</div>
+        <div class="stat-label">Avg Difficulty</div>
+      </div>
+    </div>
+
+    <!-- Grid Layout -->
+    <div class="content-grid">
+
+      <!-- Left: Form Panel -->
+      <section class="panel form-panel">
+        <div class="panel-header">
+          <h2 id="form-title">Add New Question</h2>
+          <button id="btn-cancel-edit" class="btn-sm btn-ghost" style="display: none;">Cancel Edit</button>
+        </div>
+
+        <!-- AI Vision Screenshot Section -->
+        <div class="ai-box">
+          <div class="ai-box-header">
+            <div class="ai-badge">✨ AI Vision Auto-Extract</div>
+            <span class="ai-subtext">Drop ChatGPT or Exam screenshot to auto-fill</span>
+          </div>
+
+          <div class="ai-dropzone" id="ai-dropzone">
+            <input type="file" id="ai-image-input" accept="image/*" style="display:none;">
+            <div class="ai-dropzone-content" id="ai-upload-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28">
+                <path d="M12 16v-8m0 0l-3 3m3-3l3 3"/>
+                <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/>
+              </svg>
+              <p><strong>Upload ChatGPT Solution / Question Photo</strong></p>
+              <span>Auto-extracts Qs, Options A-D, Answer & LaTeX math</span>
+            </div>
+            <div class="ai-preview-box" id="ai-preview-box" style="display:none;">
+              <img id="ai-preview-img" src="" alt="AI Preview">
+              <div class="ai-preview-overlay">
+                <span id="ai-file-name">screenshot.png</span>
+                <button type="button" class="btn-xs btn-danger" id="btn-clear-ai-image">Remove</button>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" id="btn-run-ai" class="btn btn-ai" style="width:100%; margin-top:10px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            Extract Question & Math Solution
+          </button>
+        </div>
+
+        <hr class="panel-divider">
+
+        <!-- Form -->
+        <form id="question-form" autocomplete="off">
+          <input type="hidden" id="edit-index" value="-1">
+
+          <div class="form-row two-cols">
+            <div class="form-group">
+              <label for="q-id">Question ID <span class="required">*</span></label>
+              <input type="number" id="q-id" required placeholder="e.g. 101">
+            </div>
+            <div class="form-group">
+              <label for="q-topicid">Topic ID <span class="required">*</span></label>
+              <input type="number" id="q-topicid" required placeholder="e.g. 1">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="q-question">Question Text <span class="required">*</span></label>
+            <textarea id="q-question" required rows="3" placeholder="Enter question text... (Supports $LaTeX$ math)"></textarea>
+          </div>
+
+          <!-- Options -->
+          <div class="options-grid">
+            <div class="form-group">
+              <label for="q-optionA">Option A <span class="required">*</span></label>
+              <input type="text" id="q-optionA" required placeholder="Choice A">
+            </div>
+            <div class="form-group">
+              <label for="q-optionB">Option B <span class="required">*</span></label>
+              <input type="text" id="q-optionB" required placeholder="Choice B">
+            </div>
+            <div class="form-group">
+              <label for="q-optionC">Option C <span class="required">*</span></label>
+              <input type="text" id="q-optionC" required placeholder="Choice C">
+            </div>
+            <div class="form-group">
+              <label for="q-optionD">Option D <span class="required">*</span></label>
+              <input type="text" id="q-optionD" required placeholder="Choice D">
+            </div>
+          </div>
+
+          <div class="form-row two-cols">
+            <div class="form-group">
+              <label for="q-answer">Correct Answer <span class="required">*</span></label>
+              <select id="q-answer" required>
+                <option value="optionA">Option A</option>
+                <option value="optionB">Option B</option>
+                <option value="optionC">Option C</option>
+                <option value="optionD">Option D</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="q-difficulty">Difficulty <span class="required">*</span></label>
+              <select id="q-difficulty" required>
+                <option value="1">1 — Easy</option>
+                <option value="2">2 — Medium</option>
+                <option value="3">3 — Hard</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Image Upload for question -->
+          <div class="form-group">
+            <label>Question Image (Optional)</label>
+            <div class="image-upload-container">
+              <div class="image-upload-area" id="image-upload-area">
+                <input type="file" id="image-input" accept="image/*" style="display: none;">
+                <div class="upload-placeholder" id="upload-placeholder">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                  <span>Click or drag image file here</span>
+                </div>
+                <div class="image-preview-container" id="image-preview-container" style="display: none;">
+                  <img id="image-preview" src="" alt="Preview">
+                  <button type="button" class="btn-remove-image" id="btn-remove-image" title="Remove image">&times;</button>
+                </div>
+              </div>
+              <div class="image-name-group">
+                <input type="text" id="q-image-name" placeholder="Image filename (e.g. 2526_Q2.png)">
+                <div class="github-url-preview" id="github-url-preview" style="display: none;">
+                  <span class="url-label">GitHub URL:</span>
+                  <code id="github-url-text"></code>
+                  <button type="button" class="btn-icon" id="btn-copy-url" title="Copy URL">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Explanation with KaTeX Live Render -->
+          <div class="form-group">
+            <label for="q-explanation">Explanation (LaTeX Supported)</label>
+            <textarea id="q-explanation" rows="3" placeholder="Step-by-step solution. Math in $...$ will render with KaTeX!"></textarea>
+            
+            <!-- Live Math Preview -->
+            <div class="katex-preview-box">
+              <div class="katex-preview-header">Live Math Explanation Preview</div>
+              <div id="katex-preview-content" class="katex-preview-content">
+                <span class="preview-empty">Type solution above with $...$ math to preview</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-submit" id="btn-submit">
+              <span id="btn-submit-text">Add Question</span>
+            </button>
+            <button type="button" class="btn btn-ghost" id="btn-clear-form">Clear</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Right: Table Panel -->
+      <section class="panel table-panel">
+        <div class="table-toolbar">
+          <div class="search-group">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="search-input" placeholder="Search questions, options, explanation...">
+          </div>
+          <div class="filter-group">
+            <select id="filter-topic">
+              <option value="">All Topics</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrapper" id="table-wrapper">
+          <div class="empty-state" id="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            <h3>No questions found</h3>
+            <p>Add a question using the form or import an existing CSV file.</p>
+          </div>
+
+          <table class="questions-table" id="questions-table" style="display: none;">
+            <thead>
+              <tr>
+                <th style="width: 55px;">ID</th>
+                <th style="width: 60px;">Topic</th>
+                <th>Question</th>
+                <th style="width: 65px;">Ans</th>
+                <th style="width: 70px;">Image</th>
+                <th style="width: 65px;">Diff</th>
+                <th style="width: 80px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="questions-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- API Key Modal -->
+  <div class="modal-backdrop" id="modal-api-key" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>🔑 Google Gemini API Key</h3>
+        <button class="btn-close-modal" id="btn-close-api-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">Enter your Gemini API key to enable AI Vision for reading ChatGPT screenshots and auto-formatting LaTeX math.</p>
+        
+        <div class="form-group">
+          <label for="input-api-key">Gemini API Key</label>
+          <input type="password" id="input-api-key" placeholder="AIzaSy...">
+        </div>
+        <p class="help-text">Don't have a key? Get a free key in 1 minute from <a href="https://aistudio.google.com/" target="_blank" rel="noopener">Google AI Studio</a>.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="btn-remove-api-key">Remove Key</button>
+        <button class="btn btn-primary" id="btn-save-api-key">Save Key</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Multi-Part AI Extraction Modal -->
+  <div class="modal-backdrop" id="modal-batch-ai" style="display: none;">
+    <div class="modal-box modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3>✨ AI Extracted Sub-Questions (<span id="batch-count">0</span>)</h3>
+          <p class="modal-subtitle">Review and edit multi-part questions before adding to spreadsheet</p>
+        </div>
+        <button class="btn-close-modal" id="btn-close-batch-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="batch-list" id="batch-list">
+          <!-- Dynamically populated with extracted sub-questions -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="btn-cancel-batch">Cancel</button>
+        <button class="btn btn-primary" id="btn-import-all-batch">Import All Sub-Questions</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pending Image Download Modal -->
+  <div class="modal-backdrop" id="image-download-modal" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>📁 Upload Images to GitHub</h3>
+        <button class="btn-close-modal" id="btn-close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>You have added <strong>new image(s)</strong> that need to be uploaded to your GitHub repository:</p>
+        <div class="pending-images-list" id="pending-images-list"></div>
+        <div class="github-instructions">
+          <h4>Steps to finish:</h4>
+          <ol>
+            <li>Click <strong>"Download All Images"</strong> below.</li>
+            <li>Go to <a href="https://github.com/jlohix/Duoling-for-CA" target="_blank" rel="noopener">jlohix/Duoling-for-CA</a>.</li>
+            <li>Click <strong>"Add file" &rarr; "Upload files"</strong>.</li>
+            <li>Drag & drop the downloaded images and click <strong>"Commit changes"</strong>.</li>
+          </ol>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="btn-download-images">Download All Images</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-overlay" style="display: none;"></div>
+  <div class="toast-container" id="toast-container"></div>
+  
+  <script src="app.js"></script>
+</body>
+</html>
