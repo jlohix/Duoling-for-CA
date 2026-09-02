@@ -1,0 +1,14 @@
+{
+  "name": "ee2101-adaptive-prototype",
+  "version": "0.1.0",
+  "description": "Prototype: adaptive-difficulty quiz engine for EE2101 Circuit Analysis (Duolingo-style DIP project). Zero external dependencies - uses only Node.js built-ins (http, node:sqlite).",
+  "main": "backend/server.js",
+  "scripts": {
+    "import": "node backend/scripts/import_questions.js",
+    "start": "node backend/server.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "license": "MIT"
+}

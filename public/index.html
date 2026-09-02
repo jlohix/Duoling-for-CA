@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EE2101 Adaptive Quiz — Prototype</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>EE2101 Adaptive Quiz</h1>
+    <div class="sub">Duolingo-style prototype &middot; Circuit Analysis</div>
+  </div>
+  <nav id="nav" class="hidden">
+    <button id="navQuiz" class="active">Quiz</button>
+    <button id="navProfile">Profile</button>
+    <button id="navLogout">Switch user</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- LOGIN -->
+  <section id="loginView" class="card">
+    <label for="usernameInput">Enter your name or student ID to start</label>
+    <input type="text" id="usernameInput" placeholder="e.g. student01" autocomplete="off" />
+    <button class="primary" id="loginBtn">Start</button>
+    <p class="note">
+      Prototype login only — no password, this is not production auth. Progress is
+      saved server-side per name you enter.
+    </p>
+  </section>
+
+  <!-- TOPIC PICKER -->
+  <section id="topicPickerView" class="card hidden">
+    <label for="topicSelect">Choose a topic</label>
+    <select id="topicSelect"></select>
+    <button class="primary" id="startQuizBtn">Start quiz</button>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quizView" class="card hidden">
+    <div class="topbar-row">
+      <div>
+        <span class="stage-tag" id="stageTag"></span>
+      </div>
+      <div style="display:flex; align-items:center; gap:0.6rem;">
+        <span class="badge" id="difficultyBadge">–</span>
+        <div class="prof-bar-track"><div class="prof-bar-fill" id="profBarFill" style="width:50%"></div></div>
+        <span id="profValue" style="font-size:0.8rem; color:var(--muted);">50</span>
+      </div>
+    </div>
+
+    <div class="question-text" id="questionText">Loading question…</div>
+    <div class="options" id="optionsList"></div>
+
+    <div id="feedbackBox"></div>
+
+    <div style="margin-top:1.1rem; display:flex; gap:0.6rem;">
+      <button class="primary hidden" id="nextBtn">Next question →</button>
+      <button class="secondary" id="changeTopicBtn">Change topic</button>
+    </div>
+  </section>
+
+  <!-- PROFILE -->
+  <section id="profileView" class="card hidden">
+    <h3 style="margin-top:0;">Your progress</h3>
+    <div id="overallStats" class="note" style="margin-top:0;"></div>
+    <div id="topicList"></div>
+  </section>
+
+</main>
+
+<script src="/app.js"></script>
+</body>
+</html>
