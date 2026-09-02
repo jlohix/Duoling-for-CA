@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EE2101 Adaptive Quiz — Prototype</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <svg class="logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="20" cy="20" r="19" fill="url(#g)" />
+      <path d="M22 8L11 22h7l-2 10 12-15h-7l1-9z" fill="white"/>
+      <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#7C6FF0"/>
+          <stop offset="1" stop-color="#5B4FE0"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <div>
+      <h1>EE2101 Adaptive Quiz</h1>
+      <div class="sub">Duolingo-style prototype &middot; Circuit Analysis</div>
+    </div>
+  </div>
+
+  <div id="statsBar" class="stats-bar hidden">
+    <span class="stat" id="statStreak" title="Daily streak">🔥 <b>0</b></span>
+    <span class="stat" id="statXp" title="Total XP">⭐ <b>0</b> XP</span>
+    <span class="stat hearts" id="statHearts" title="Hearts"></span>
+  </div>
+
+  <nav id="nav" class="hidden">
+    <button id="navQuiz" class="active">Quiz</button>
+    <button id="navProfile">Profile</button>
+    <button id="navLogout">Switch user</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- LOGIN -->
+  <section id="loginView" class="card centered">
+    <div class="hero-icon">⚡</div>
+    <h2 class="view-title">Welcome!</h2>
+    <p class="view-subtitle">Enter your name or student ID to start practicing.</p>
+    <label for="usernameInput" class="sr-only">Name or student ID</label>
+    <input type="text" id="usernameInput" placeholder="e.g. student01" autocomplete="off" />
+    <button class="primary full" id="loginBtn">Start learning</button>
+    <p class="note">
+      Prototype login only — no password, this is not production auth. Progress is
+      saved server-side per name you enter.
+    </p>
+  </section>
+
+  <!-- TOPIC PICKER -->
+  <section id="topicPickerView" class="hidden">
+    <h2 class="view-title">Choose a topic</h2>
+    <p class="view-subtitle">Pick up where you left off, or start a new week.</p>
+    <div id="topicGrid" class="topic-grid"></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quizView" class="card hidden">
+    <div class="topbar-row">
+      <span class="stage-tag" id="stageTag"></span>
+      <div class="quiz-meta">
+        <span class="badge" id="difficultyBadge">–</span>
+        <div class="prof-bar-track"><div class="prof-bar-fill" id="profBarFill" style="width:50%"></div></div>
+      </div>
+    </div>
+
+    <div id="comboBanner" class="combo-banner hidden"></div>
+
+    <div id="imagePlaceholder" class="image-placeholder hidden">
+      <div class="image-placeholder-icon">📊</div>
+      <div class="image-placeholder-text">
+        Diagram not available yet<br/>
+        <span>This question references a circuit diagram that hasn't been added to the
+        prototype yet — flagged for the content team.</span>
+      </div>
+    </div>
+
+    <div class="question-text" id="questionText">Loading question…</div>
+    <div class="options" id="optionsList"></div>
+
+    <div id="feedbackBox"></div>
+
+    <div style="margin-top:1.1rem; display:flex; gap:0.6rem;">
+      <button class="primary hidden" id="nextBtn">Next question →</button>
+      <button class="secondary" id="changeTopicBtn">Change topic</button>
+    </div>
+  </section>
+
+  <!-- OUT OF HEARTS -->
+  <section id="outOfHeartsView" class="card centered hidden">
+    <div class="hero-icon">💔</div>
+    <h2 class="view-title">Out of hearts!</h2>
+    <p class="view-subtitle">Take a short breather — your hearts refill over time.</p>
+    <div class="heart-timer" id="heartTimer">--:--</div>
+    <p class="note">until your next heart</p>
+    <button class="secondary" id="heartsChangeTopicBtn" style="margin-top:1rem;">Back to topics</button>
+  </section>
+
+  <!-- PROFILE -->
+  <section id="profileView" class="card hidden">
+    <h2 class="view-title" style="margin-top:0;">Your progress</h2>
+    <div id="overallStats" class="stats-summary"></div>
+    <div id="topicList"></div>
+  </section>
+
+</main>
+
+<div id="toastLayer"></div>
+
+<script src="/app.js"></script>
+</body>
+</html>
