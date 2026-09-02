@@ -1,4 +1,5 @@
 import Papa from "papaparse";
+import pastYearCsv from "./pastYearPapers.csv?raw";
 
 const LETTERS = ["a", "b", "c", "d"];
 
@@ -33,46 +34,129 @@ export function isAnswerCorrect(question, choice) {
   return Boolean(chosen && correct && chosen === correct);
 }
 
+function parseAnswerLetter(value) {
+  const raw = clean(value).toLowerCase();
+  if (LETTERS.includes(raw)) return raw;
+  const opt = raw.match(/^option\s*([abcd])$/);
+  if (opt) return opt[1];
+  return "";
+}
+
+function cell(row, ...names) {
+  for (const name of names) {
+    if (row[name] != null && String(row[name]).trim()) return row[name];
+    const hit = Object.keys(row).find(
+      (key) => key.toLowerCase() === name.toLowerCase()
+    );
+    if (hit && String(row[hit]).trim()) return row[hit];
+  }
+  return "";
+}
+
+function paperFromImage(url) {
+  const file = String(url).split("/").pop() || "";
+  const match = file.match(/^(\d{2})(\d{2})(s[12])?/i);
+  if (!match) return "";
+  const sem = match[3] ? ` ${match[3].toUpperCase()}` : "";
+  return `PYP · AY ${match[1]}/${match[2]}${sem}`;
+}
+
+function dressLatex(text) {
+  const raw = clean(text);
+  if (!raw) return raw;
+  if (/\$|\\\(|\\\[/.test(raw)) return raw;
+  if (/\\frac|\\mathrm|\\text|\\left|\\right/.test(raw)) return `$${raw}$`;
+  return raw;
+}
+
+function parseQuestionRows(text, { withPaper = false } = {}) {
+  const parsed = Papa.parse(String(text ?? "").replace(/^\uFEFF/, ""), {
+    header: true,
+    skipEmptyLines: true,
+    transformHeader: (h) => String(h ?? "").replace(/^\uFEFF/, "").trim(),
+  });
+
+  const questions = [];
+  for (const row of parsed.data) {
+    const question = dressLatex(cell(row, "question"));
+    const answer = parseAnswerLetter(cell(row, "answer"));
+    if (!question || !LETTERS.includes(answer)) continue;
+
+    const options = {
+      a: dressLatex(cell(row, "optionA")),
+      b: dressLatex(cell(row, "optionB")),
+      c: dressLatex(cell(row, "optionC")),
+      d: dressLatex(cell(row, "optionD")),
+    };
+    if (!options[answer]) continue;
+
+    const image = normalizeImage(cell(row, "image"));
+    const topicRaw = cell(row, "topicId", "topicid");
+    const item = {
+      id: clean(cell(row, "id")) || `${topicRaw || "p"}-${questions.length}`,
+      topicId: Number(topicRaw) || 0,
+      question,
+      options,
+      answer,
+      image,
+      explanation: dressLatex(cell(row, "explanation")),
+      difficulty: parseDifficulty(cell(row, "difficulty")),
+    };
+    if (withPaper) {
+      item.paper =
+        clean(cell(row, "paper", "year")) ||
+        paperFromImage(image) ||
+        "Past papers";
+    }
+    questions.push(item);
+  }
+  return questions;
+}
+
 export async function loadQuestions() {
   const res = await fetch("/QuestionBank.csv");
   if (!res.ok) {
     throw new Error("Could not load QuestionBank.csv");
   }
   const text = await res.text();
-  const parsed = Papa.parse(text, {
-    header: true,
-    skipEmptyLines: true,
-  });
-
-  const questions = [];
-  for (const row of parsed.data) {
-    const question = clean(row.question);
-    const answer = clean(row.answer).toLowerCase();
-    if (!question || !LETTERS.includes(answer)) continue;
-
-    const options = {
-      a: clean(row.optionA),
-      b: clean(row.optionB),
-      c: clean(row.optionC),
-      d: clean(row.optionD),
-    };
-    if (!options[answer]) continue;
-
-    questions.push({
-      id: clean(row.id) || `${row.topicId}-${questions.length}`,
-      topicId: Number(row.topicId),
-      question,
-      options,
-      answer,
-      image: normalizeImage(row.image),
-      explanation: clean(row.explanation),
-      difficulty: parseDifficulty(row.difficulty),
-    });
-  }
-  return questions;
+  return parseQuestionRows(text);
 }
 
-function shuffle(list) {
+export const PAST_YEAR_QUESTIONS = parseQuestionRows(pastYearCsv, {
+  withPaper: true,
+});
+
+export function loadPastYearQuestions() {
+  return Promise.resolve(PAST_YEAR_QUESTIONS);
+}
+
+export function groupPastPapers(questions) {
+  const map = new Map();
+  for (const q of questions) {
+    const title = q.paper || "Past papers";
+    if (!map.has(title)) map.set(title, []);
+    map.get(title).push(q);
+  }
+  return [...map.entries()].map(([title, list]) => {
+    const key = paperKey(title);
+    return {
+      id: key,
+      key,
+      title,
+      questions: list,
+    };
+  });
+}
+
+function paperKey(title) {
+  const slug = String(title)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return `paper-${slug || "set"}`;
+}
+
+export function shuffle(list) {
   const shuffled = [...list];
   for (let i = shuffled.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * (i + 1));

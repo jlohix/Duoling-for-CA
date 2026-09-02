@@ -1,0 +1,62 @@
+export const MAX_POWER_STEPS = [
+  {
+    id: "meet",
+    view: "loop",
+    highlight: "all",
+    title: "Power in the load",
+    body: "A DC source has some series resistance $R_s$ (wires, internal drop). You attach a load $R_L$. Load current is $I_L = \\dfrac{V}{R_s + R_L}$. Power in the load is $P_L = I_L^2 R_L$.",
+    eq: "$I_L = \\dfrac{V}{R_s + R_L}$",
+  },
+  {
+    id: "trade",
+    view: "loop",
+    highlight: "load",
+    title: "A trade-off",
+    body: "If $R_L$ is tiny, $I_L$ is large but $P_L = I_L^2 R_L$ is still small. If $R_L$ is huge, almost no current flows, so $P_L$ is small again. The peak sits in the middle.",
+    eq: "Small $R_L$ or huge $R_L$ both give little $P_L$",
+  },
+  {
+    id: "match",
+    view: "match",
+    highlight: "load",
+    title: "Match the load",
+    body: "Maximum power in $R_L$ is when $R_L = R_s$. Here both are $4\\ \\Omega$. Then $I_L = 12 / 8 = 1.5\\ \\mathrm{A}$. After Thevenin, the same rule is $R_L = R_{th}$.",
+    eq: "$R_L = R_s$ (or $R_L = R_{th}$)",
+    check: {
+      prompt: "For max power in the load, set $R_L$ to",
+      options: {
+        a: "$0\\ \\Omega$ so current is as large as possible.",
+        b: "Equal to $R_s$.",
+        c: "Much larger than $R_s$ so $V_L \\approx V$.",
+      },
+      answer: "b",
+      why: "Match $R_L$ to $R_s$. Zero ohms dumps power in $R_s$; a huge $R_L$ starves the current.",
+    },
+  },
+  {
+    id: "pmax",
+    view: "pmax",
+    highlight: "p",
+    title: "How much power",
+    body: "At the match, half the voltage sits on $R_L$, so $V_L = V/2$ and $P_{\\max} = \\dfrac{(V/2)^2}{R_s} = \\dfrac{V^2}{4 R_s}$. Here $P_{\\max} = \\dfrac{12^2}{4 \\times 4} = 9\\ \\mathrm{W}$.",
+    eq: "$P_{\\max} = \\dfrac{V^2}{4 R_s}$",
+    check: {
+      prompt: "$V = 12\\ \\mathrm{V}$, $R_s = 4\\ \\Omega$, $R_L = 4\\ \\Omega$. $P_{\\max}$ is",
+      options: {
+        a: "$36\\ \\mathrm{W}$ ($V^2 / R_s$).",
+        b: "$18\\ \\mathrm{W}$ ($V^2 / (2 R_s)$).",
+        c: "$9\\ \\mathrm{W}$ ($V^2 / (4 R_s)$).",
+      },
+      answer: "c",
+      why: "$12^2 / (4 \\times 4) = 144 / 16 = 9\\ \\mathrm{W}$. Do not skip the 4 in the denominator.",
+    },
+  },
+  {
+    id: "lab",
+    view: "match",
+    highlight: "load",
+    title: "Your turn",
+    body: "This lab is DC only. Pick the matching $R_L$, or pick $P_{\\max}$ from $V^2 / (4 R_s)$. No XP.",
+    eq: "Match $R_L$ to $R_s$, then $P_{\\max} = V^2 / (4 R_s)$",
+  },
+];

@@ -30,7 +30,7 @@ export default function Results({ summary, onHome }) {
       {skip ? (
         <p className="skip-result">
           {failedSkip
-            ? `You need ${summary.needed}/${summary.total} to skip. Try the lessons, then skip again.`
+            ? `You need ${summary.needed}/${summary.total} first try. A second miss ends the skip. Try the lessons, then skip again.`
             : `You scored ${summary.correct}/${summary.total}. This topic is open.`}
         </p>
       ) : null}

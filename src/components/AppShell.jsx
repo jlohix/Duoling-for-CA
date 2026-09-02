@@ -12,17 +12,20 @@ const STUDENT_LINKS = [
   { id: "leagues", label: "Trophy leagues", group: "Leagues", icon: "fa-trophy" },
   { id: "classboard", label: "Class board", group: "Compete", icon: "fa-users" },
   { id: "cohortboard", label: "Cohort board", group: "Compete", icon: "fa-sitemap" },
+  { id: "individualboard", label: "Individual", group: "Compete", icon: "fa-user" },
   { id: "guide", label: "How to use", group: "Help", icon: "fa-question-circle" },
   { id: "updates", label: "Updates", group: "Help", icon: "fa-bullhorn" },
 ];
 
 const ADMIN_LINKS = [
+  { id: "home", label: "Learn", group: "Study", icon: "fa-book" },
   { id: "admin", label: "Students", group: "Staff", icon: "fa-users" },
   { id: "updates", label: "Updates", group: "Staff", icon: "fa-bullhorn" },
   { id: "guide", label: "How to use", group: "Staff", icon: "fa-question-circle" },
   { id: "leagues", label: "Trophy leagues", group: "Leagues", icon: "fa-trophy" },
   { id: "classboard", label: "Class board", group: "Compete", icon: "fa-list-ol" },
   { id: "cohortboard", label: "Cohort board", group: "Compete", icon: "fa-sitemap" },
+  { id: "individualboard", label: "Individual", group: "Compete", icon: "fa-user" },
 ];
 
 export default function AppShell({
@@ -76,7 +79,7 @@ export default function AppShell({
           <h1>Circuito</h1>
           <p className="login-user">Hi, {user.username}</p>
           {admin ? (
-            <p className="sidebar-stats">Staff tools</p>
+            <p className="sidebar-stats">Staff tools · preview, no XP</p>
           ) : (
             <p className="sidebar-stats">
               {progress.xp} XP · {streak} day streak

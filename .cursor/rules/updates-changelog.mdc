@@ -1,0 +1,17 @@
+---
+description: Append a student-facing Updates log after product changes from chat
+alwaysApply: true
+---
+
+# Updates log after chat work
+
+When a user prompt leads to a **student-visible** Circuito change (UI, scoring, leagues, classes, lessons, streak, help), add a new object at the **top** of `BUILT_IN_LOGS` in `src/data/changelog.js`.
+
+- `id`: `built-YYYY-MM-DD-short-slug` (unique)
+- `date`: today's date `YYYY-MM-DD` from the user message
+- `title`: a few words
+- `body`: 1–2 sentences, student-friendly, no file names or git talk
+
+Skip the log for: refactors with no user-facing change, chat-only answers, incomplete/failed work, or when the user says not to log.
+
+Do not write to `localStorage` changelog; only `changelog.js`.

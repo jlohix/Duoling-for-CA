@@ -2,7 +2,12 @@ import { useState } from "react";
 import { isAnswerCorrect } from "../data/loadQuestions";
 import { XP_CORRECT } from "../state/progress";
 
-export function useQuizQueue(initialQuestions, xpPerCorrect = XP_CORRECT) {
+export function useQuizQueue(
+  initialQuestions,
+  xpPerCorrect = XP_CORRECT,
+  options = {}
+) {
+  const recycleMissed = options.recycleMissed !== false;
   const [queue, setQueue] = useState(initialQuestions);
   const originalTotal = initialQuestions.length;
   const [index, setIndex] = useState(0);
@@ -36,13 +41,16 @@ export function useQuizQueue(initialQuestions, xpPerCorrect = XP_CORRECT) {
   function goNext() {
     if (!question) return { done: true };
     const ok = isAnswerCorrect(question, selected);
-    const nextQueue = ok ? queue : [...queue, question];
-    if (!ok) setQueue(nextQueue);
+    const nextQueue =
+      recycleMissed && !ok ? [...queue, question] : queue;
+    if (recycleMissed && !ok) setQueue(nextQueue);
     if (index + 1 >= nextQueue.length) {
       return { done: true };
     }
     const enteringReview =
-      index + 1 === originalTotal && nextQueue.length > originalTotal;
+      recycleMissed &&
+      index + 1 === originalTotal &&
+      nextQueue.length > originalTotal;
     setSelected("");
     setRevealed(false);
     if (enteringReview) {

@@ -1,5 +1,9 @@
 import { useMemo, useState } from "react";
-import { questionsForLesson, isAnswerCorrect } from "../data/loadQuestions";
+import {
+  questionsForLesson,
+  isAnswerCorrect,
+  shuffle,
+} from "../data/loadQuestions";
 import { DIFFICULTIES, TOPICS, lessonKey } from "../data/topics";
 import { addXp, completeLesson, visibleStreak, wouldExtendStreak, xpForCorrect, xpForLessonBonus, recordFirstTry } from "../state/progress";
 import { useQuizQueue } from "../hooks/useQuizQueue";
@@ -20,22 +24,31 @@ export default function Lesson({
   setProgress,
   onExit,
   onFinished,
+  preview = false,
+  pack = null,
 }) {
-  const key = lessonKey(topicId, difficulty);
+  const paperMode = Boolean(pack);
+  const key = paperMode ? pack.key : lessonKey(topicId, difficulty);
   const alreadyDone = Boolean(progress.completed?.includes(key));
-  const xpEach = alreadyDone ? 0 : xpForCorrect(difficulty);
-  const xpBonus = alreadyDone ? 0 : xpForLessonBonus(difficulty);
+  const xpDiff = paperMode ? 2 : difficulty;
+  const xpEach = preview || alreadyDone ? 0 : xpForCorrect(xpDiff);
+  const xpBonus = preview || alreadyDone ? 0 : xpForLessonBonus(xpDiff);
 
   const initial = useMemo(
-    () => questionsForLesson(allQuestions, topicId, difficulty),
-    [allQuestions, topicId, difficulty]
+    () =>
+      paperMode
+        ? shuffle(pack.questions)
+        : questionsForLesson(allQuestions, topicId, difficulty),
+    [allQuestions, topicId, difficulty, paperMode, pack]
   );
   const quiz = useQuizQueue(initial, xpEach);
   const [leaveOpen, setLeaveOpen] = useState(false);
-  const [stage, setStage] = useState("teach");
+  const [stage, setStage] = useState(paperMode ? "quiz" : "teach");
 
   const topic = TOPICS.find((t) => t.id === topicId);
   const diff = DIFFICULTIES.find((d) => d.id === difficulty);
+  const topicName = paperMode ? pack.title : topic?.name;
+  const difficultyName = paperMode ? "Past paper" : diff?.name;
 
   if (stage === "teach") {
     return (
@@ -51,6 +64,20 @@ export default function Lesson({
   }
 
   function finish() {
+    if (preview) {
+      onFinished({
+        status: "complete",
+        correct: quiz.firstPassCorrect,
+        total: quiz.originalTotal,
+        xpGained: 0,
+        streak: visibleStreak(progress),
+        streakFrom: visibleStreak(progress),
+        streakGrew: false,
+        topicName,
+        difficultyName,
+      });
+      return;
+    }
     const grew = wouldExtendStreak(progress);
     const streakFrom = visibleStreak(progress);
     let next = progress;
@@ -66,8 +93,8 @@ export default function Lesson({
       streak: visibleStreak(next),
       streakFrom,
       streakGrew: grew,
-      topicName: topic?.name,
-      difficultyName: diff?.name,
+      topicName,
+      difficultyName,
     });
   }
 
@@ -104,8 +131,8 @@ export default function Lesson({
         <ThemeSwitch compact />
       </header>
       <p className="lesson-meta">
-        {topic?.name} · {diff?.name} · {quiz.index + 1}/{quiz.queueLength}
-        {xpEach ? ` · +${xpEach} XP` : " · practice"}
+        {topicName} · {difficultyName} · {quiz.index + 1}/{quiz.queueLength}
+        {preview ? " · staff preview · no XP" : xpEach ? ` · +${xpEach} XP` : " · practice"}
       </p>
       {quiz.reviewOpen ? (
         <ReviewGate count={quiz.reviewCount} onContinue={quiz.startReview} />
@@ -126,10 +153,11 @@ export default function Lesson({
                 disabled={!quiz.selected}
                 onClick={() =>
                   quiz.check(({ ok, firstTry, awardXp, question }) => {
+                    if (preview) return;
                     setProgress((p) => {
                       let next = p;
                       if (awardXp && xpEach) next = addXp(next, xpEach);
-                      if (firstTry)
+                      if (firstTry && !paperMode && question.topicId)
                         next = recordFirstTry(next, question.topicId, ok);
                       return next;
                     });
@@ -156,6 +184,7 @@ export default function Lesson({
         open={leaveOpen}
         onStay={() => setLeaveOpen(false)}
         onLeave={onExit}
+        preview={preview}
       />
     </div>
   );

@@ -1,0 +1,100 @@
+export const NON_INVERTING_STEPS = [
+  {
+    id: "meet",
+    title: "The non-inverting amplifier",
+    highlight: "all",
+    body: "The signal $v_i$ goes straight into the $+$ pin. A resistor divider $R_f$ and $R_g$ sits on the $-$ pin: $R_g$ to ground, $R_f$ back to the output. We want $v_o$ in terms of $v_i$.",
+    eq: "$v_o = \\,?\\,v_i$",
+  },
+  {
+    id: "ideal",
+    title: "Two ideal op-amp rules",
+    highlight: "plus",
+    body: "Negative feedback is working, so treat the op-amp as ideal. No current into either pin: $i_+ = i_- = 0$. The pins sit at the same voltage: $v_+ = v_-$.",
+    eq: "$v_+ = v_- \\quad i_- = 0$",
+  },
+  {
+    id: "copy",
+    title: "The $+$ pin copies $v_i$",
+    highlight: "plus",
+    body: "The $+$ pin is wired to $v_i$, so $v_+ = v_i$. The virtual short copies that onto the $-$ pin. Unlike the inverting amp, this is not a virtual ground — $v_-$ sits at $v_i$.",
+    eq: "$v_- = v_i$",
+    check: {
+      prompt: "Why is $v_- = v_i$?",
+      options: {
+        a: "The $-$ pin is soldered to the input source.",
+        b: "$v_+ = v_i$, and feedback forces $v_- = v_+$.",
+        c: "$R_g$ is a short, so both pins are $0\\ \\mathrm{V}$.",
+      },
+      answer: "b",
+      why: "The input sets $v_+$. The virtual short copies it to $v_-$.",
+    },
+  },
+  {
+    id: "rg",
+    title: "Current through $R_g$",
+    highlight: "rg",
+    body: "Ohm’s law on $R_g$: the top is $v_- = v_i$, the bottom is ground. No current enters the op-amp pin, so that current is $i = v_i / R_g$, flowing down through $R_g$.",
+    eq: "$i = v_i / R_g$",
+  },
+  {
+    id: "rf",
+    title: "The same current through $R_f$",
+    highlight: "rf",
+    body: "That current also flows through $R_f$ (the pin steals none of it). Ohm on $R_f$: $v_o - v_- = i R_f$. Substitute $v_- = v_i$ and $i = v_i / R_g$.",
+    eq: "$v_o - v_i = (v_i / R_g) R_f$",
+  },
+  {
+    id: "solve",
+    title: "Solve for $v_o$",
+    highlight: "out",
+    body: "Factor $v_i$: $v_o = v_i + v_i (R_f / R_g) = v_i (1 + R_f / R_g)$. There is no minus sign — $v_o$ moves the same way as $v_i$. The extra $1$ is the input sitting on $R_g$.",
+    eq: "$v_o = \\left(1 + \\dfrac{R_f}{R_g}\\right) v_i$",
+    check: {
+      prompt: "Closed-loop gain $v_o / v_i$ is",
+      options: {
+        a: "$-R_f / R_g$",
+        b: "$1 + R_f / R_g$",
+        c: "$R_g / R_f$",
+      },
+      answer: "b",
+      why: "Non-inverting gain is $1 + R_f/R_g$. The minus form is the inverting amplifier.",
+    },
+  },
+  {
+    id: "read",
+    title: "How to read the $1 +$",
+    highlight: "all",
+    body: "Gain is always at least $1$. Equal resistors give gain $2$. A buffer (gain $1$) is this circuit with $R_f = 0$ (a wire) and $R_g$ open. Same ideal-op-amp assumption as the inverting lab.",
+    eq: "$\\dfrac{v_o}{v_i} = 1 + \\dfrac{R_f}{R_g}$",
+  },
+];
+
+export const NON_INVERTING_PRACTICE = [
+  {
+    id: "ninv-g5",
+    rg: 2,
+    correctOhm: 8,
+    choices: [2, 4, 8, 16],
+    why: "Gain is $1 + R_f/R_g = 5$, so $R_f/R_g = 4$ and $R_f = 8\\ \\mathrm{k}\\Omega$.",
+    prompt: "$R_g = 2\\ \\mathrm{k}\\Omega$. Drop $R_f$ so the gain is $5$.",
+  },
+  {
+    id: "ninv-g3",
+    rg: 4,
+    correctOhm: 8,
+    choices: [2, 4, 8, 12],
+    why: "$1 + R_f/4 = 3$ means $R_f/4 = 2$, so $R_f = 8\\ \\mathrm{k}\\Omega$.",
+    prompt: "$R_g = 4\\ \\mathrm{k}\\Omega$. Drop $R_f$ so $v_o / v_i = 3$.",
+  },
+  {
+    id: "ninv-vi",
+    rg: 5,
+    vi: 2,
+    vo: 12,
+    correctOhm: 25,
+    choices: [5, 10, 20, 25],
+    why: "$v_o/v_i = 12/2 = 6 = 1 + R_f/5$, so $R_f = 25\\ \\mathrm{k}\\Omega$.",
+    prompt: "$R_g = 5\\ \\mathrm{k}\\Omega$, $v_i = 2\\ \\mathrm{V}$, $v_o = 12\\ \\mathrm{V}$. Drop $R_f$.",
+  },
+];

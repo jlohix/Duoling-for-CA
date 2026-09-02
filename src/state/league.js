@@ -238,20 +238,6 @@ export function skipLeagueDays(liveProgress, days = 15) {
   return syncLeagueSeason(liveProgress);
 }
 
-export function skipLeagueDays(liveProgress, days = 15) {
-  const students = listStudents(liveProgress);
-  let state = loadState();
-  if (!state) {
-    state = { seasonStart: Date.now(), ...snapshot(students, {}) };
-  }
-  const shift = Math.max(0, Number(days) || 0) * 24 * 60 * 60 * 1000;
-  saveState({
-    ...state,
-    seasonStart: Number(state.seasonStart) - shift,
-  });
-  return syncLeagueSeason(liveProgress);
-}
-
 export function formatRemain(ms) {
   const value = Math.max(0, ms);
   const days = Math.floor(value / 86400000);
@@ -262,7 +248,7 @@ export function formatRemain(ms) {
   return `${minutes}m left`;
 }
 
-export function buildLeagueBoard(user, progress) {
+export function buildLeagueBoard(user, progress, leagueIndexOverride) {
   const { state } = syncLeagueSeason(progress);
   const students = listStudents(progress);
   const now = Date.now();
@@ -273,7 +259,9 @@ export function buildLeagueBoard(user, progress) {
       (row) => row.username.toLowerCase() === focusName.toLowerCase()
     ) || students[0];
   const leagueIndex = clampLeagueIndex(
-    state.leagueIndex[focus?.username] ?? 0
+    leagueIndexOverride != null
+      ? leagueIndexOverride
+      : state.leagueIndex[focus?.username] ?? 0
   );
   const ranked = fieldForLeague(students, state, now, leagueIndex);
   const total = ranked.length;

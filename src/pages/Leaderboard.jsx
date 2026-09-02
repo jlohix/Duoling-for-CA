@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   buildClassLeaderboard,
   buildCohortLeaderboard,
+  buildIndividualLeaderboard,
   studentClassId,
 } from "../data/leaderboard";
 import { CLASS_IDS } from "../data/classes";
@@ -55,16 +56,28 @@ export default function Leaderboard({ user, progress, mode = "class" }) {
   const focusClass = admin ? classId : yourClass;
   const classBoard = buildClassLeaderboard(user, progress, focusClass);
   const cohort = buildCohortLeaderboard(user, progress);
+  const individuals = buildIndividualLeaderboard(user, progress);
   const cohortMode = mode === "cohort";
+  const individualMode = mode === "individual";
 
   return (
     <div className="page">
       <header className="topbar">
         <div>
           <p className="eyebrow">
-            {cohortMode ? "EE01–EE16" : classBoard.classId}
+            {cohortMode
+              ? "EE01–EE16"
+              : individualMode
+                ? "All classes"
+                : classBoard.classId}
           </p>
-          <h1>{cohortMode ? "Cohort leaderboard" : "Class leaderboard"}</h1>
+          <h1>
+            {cohortMode
+              ? "Cohort leaderboard"
+              : individualMode
+                ? "Individual leaderboard"
+                : "Class leaderboard"}
+          </h1>
         </div>
       </header>
       {cohortMode ? (
@@ -90,6 +103,22 @@ export default function Leaderboard({ user, progress, mode = "class" }) {
               </li>
             ))}
           </ol>
+        </>
+      ) : individualMode ? (
+        <>
+          <p className="login-hint">
+            Top 10 students in the cohort by total XP.
+            {individuals.youRank
+              ? ` You are #${individuals.youRank} of ${individuals.total}.`
+              : ` ${individuals.total} students.`}
+          </p>
+          <StudentRows rows={individuals.top} />
+          {individuals.you ? (
+            <>
+              <p className="board-cut">Your place in the cohort</p>
+              <StudentRows rows={[individuals.you]} />
+            </>
+          ) : null}
         </>
       ) : (
         <>

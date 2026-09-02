@@ -56,6 +56,9 @@ export default function LessonWarmup({
           Close
         </button>
         <p className="eyebrow lesson-teach-label">Warm-up</p>
+        <button type="button" className="ghost" onClick={onReady}>
+          Skip warm-up
+        </button>
         <ThemeSwitch compact />
       </header>
       <p className="lesson-meta">
@@ -75,9 +78,14 @@ export default function LessonWarmup({
               </li>
             ))}
           </ul>
-          <button type="button" className="primary" onClick={() => setStep("practice")}>
-            Try {primer.warmups.length} easy checks
-          </button>
+          <div className="warmup-actions">
+            <button type="button" className="primary" onClick={() => setStep("practice")}>
+              Try {primer.warmups.length} easy checks
+            </button>
+            <button type="button" className="ghost" onClick={onReady}>
+              Skip warm-up
+            </button>
+          </div>
         </section>
       ) : null}
 
@@ -102,6 +110,9 @@ export default function LessonWarmup({
                 onClick={() => setRevealed(true)}
               >
                 Check
+              </button>
+              <button type="button" className="ghost" onClick={onReady}>
+                Skip warm-up
               </button>
             </div>
           ) : (

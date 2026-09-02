@@ -37,8 +37,8 @@ export default function Updates({ canEdit = false }) {
       </header>
       <p className="focus-line">
         {canEdit
-          ? "Add a note when you ship a change. Students see this list as read-only. Built-in notes cannot be deleted."
-          : "What's new in Circuito. These notes are posted by staff."}
+          ? "Add a note when you ship a change. Built-in notes also get added from coding chat when a student-facing feature ships. Students see this list as read-only. Built-in notes cannot be deleted."
+          : "What's new in Circuito. Notes appear here when the app is updated."}
       </p>
 
       {canEdit ? (

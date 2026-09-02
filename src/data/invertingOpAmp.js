@@ -1,0 +1,100 @@
+export const INVERTING_STEPS = [
+  {
+    id: "meet",
+    title: "The inverting amplifier",
+    highlight: "all",
+    body: "We want a formula that links the output $v_o$ to the input $v_i$. The signal goes through the input resistor $R_1$ into the inverting pin (−). The feedback resistor $R_f$ ties the output back to that same pin. The non-inverting pin (+) is grounded.",
+    eq: "$v_o = \\,?\\,v_i$",
+  },
+  {
+    id: "ideal",
+    title: "Two ideal op-amp rules",
+    highlight: "minus",
+    body: "In a working negative-feedback loop, treat the op-amp as ideal. The input pins draw no current: $i_+ = i_- = 0$. The two pins sit at the same voltage: $v_+ = v_-$ (a virtual short). The output does whatever it must to keep that true.",
+    eq: "$v_+ = v_- \\quad i_- = 0$",
+  },
+  {
+    id: "vgnd",
+    title: "Virtual ground",
+    highlight: "gnd",
+    body: "The + pin is wired to ground, so $v_+ = 0$. The virtual short then forces $v_- = 0$ as well. That node is a virtual ground: it sits at $0\\ \\mathrm{V}$, but it is not a wire to ground. Current can still flow into the node and leave through $R_f$.",
+    eq: "$v_- = 0$",
+    check: {
+      prompt: "Why is $v_- = 0$?",
+      options: {
+        a: "The − pin is soldered to ground.",
+        b: "$v_+$ is ground, and feedback forces $v_- = v_+$.",
+        c: "No current ever flows in $R_1$.",
+      },
+      answer: "b",
+      why: "Ground sets $v_+ = 0$. The virtual short copies that onto the − pin.",
+    },
+  },
+  {
+    id: "rin",
+    title: "Current through $R_1$",
+    highlight: "r1",
+    body: "Ohm’s law from $v_i$ to the virtual ground: the left of $R_1$ is $v_i$, the right is $0\\ \\mathrm{V}$. So the current toward the inverting node is $i = (v_i - 0)/R_1 = v_i / R_1$. If $v_i$ is positive, current flows into the node.",
+    eq: "$i = v_i / R_1$",
+  },
+  {
+    id: "kcl",
+    title: "KCL at the − pin",
+    highlight: "rf",
+    body: "No current enters the op-amp pin, so every amp that arrives through $R_1$ must leave through $R_f$. KCL into the inverting node with $v_- = 0$: $v_i/R_1 + v_o/R_f = 0$. (A negative $v_o$ is what lets the $R_f$ term cancel the $R_1$ term.)",
+    eq: "$\\dfrac{v_i}{R_1} + \\dfrac{v_o}{R_f} = 0$",
+  },
+  {
+    id: "solve",
+    title: "Solve for $v_o$",
+    highlight: "out",
+    body: "Move the $v_o$ term: $v_o / R_f = -v_i / R_1$. Multiply both sides by $R_f$. The minus sign is not a mistake — $R_f$ is hung between $0\\ \\mathrm{V}$ and $v_o$, so a positive $i$ (to the right through $R_1$) makes $v_o$ negative.",
+    eq: "$v_o = -\\dfrac{R_f}{R_1} v_i$",
+    check: {
+      prompt: "Closed-loop gain $v_o / v_i$ is",
+      options: {
+        a: "$-R_f / R_1$",
+        b: "$1 + R_f / R_1$",
+        c: "$R_1 / R_f$",
+      },
+      answer: "a",
+      why: "That is the inverting formula. $1 + R_f/R_1$ is the non-inverting amplifier.",
+    },
+  },
+  {
+    id: "read",
+    title: "How to read the minus",
+    highlight: "all",
+    body: "The size of the gain is $R_f / R_1$. You set it with two resistors. The minus means inversion: if $v_i$ goes up, $v_o$ goes down (a $180^\\circ$ phase flip for a sine). This formula is for DC and for frequencies where the op-amp still looks ideal.",
+    eq: "$\\dfrac{v_o}{v_i} = -\\dfrac{R_f}{R_1}$",
+  },
+];
+
+export const INVERTING_PRACTICE = [
+  {
+    id: "inv-g4",
+    r1: 2,
+    correctOhm: 8,
+    choices: [2, 4, 8, 16],
+    why: "Gain is $-R_f/R_1 = -4$, so $R_f = 4 \\times 2 = 8\\ \\mathrm{k}\\Omega$.",
+    prompt: "R1 is $2\\ \\mathrm{k}\\Omega$. Drop $R_f$ so the closed-loop gain is $-4$.",
+  },
+  {
+    id: "inv-vi2",
+    r1: 4,
+    vi: 2,
+    vo: -10,
+    correctOhm: 20,
+    choices: [4, 10, 16, 20],
+    why: "$v_o/v_i = -10/2 = -5$, so $R_f/R_1 = 5$ and $R_f = 20\\ \\mathrm{k}\\Omega$.",
+    prompt: "$R_1 = 4\\ \\mathrm{k}\\Omega$, $v_i = 2\\ \\mathrm{V}$, $v_o = -10\\ \\mathrm{V}$. Drop $R_f$.",
+  },
+  {
+    id: "inv-g5",
+    r1: 3,
+    correctOhm: 15,
+    choices: [3, 9, 12, 15],
+    why: "$-R_f/R_1 = -5$ means $R_f = 15\\ \\mathrm{k}\\Omega$.",
+    prompt: "$R_1 = 3\\ \\mathrm{k}\\Omega$. Drop $R_f$ so $v_o / v_i = -5$.",
+  },
+];

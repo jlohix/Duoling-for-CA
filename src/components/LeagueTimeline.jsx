@@ -2,7 +2,7 @@ import { useState } from "react";
 import { TROPHY_TIERS, trophyFromIndex } from "../data/trophies";
 import TrophyTiersModal from "./TrophyTiersModal";
 
-export default function LeagueTimeline({ leagueIndex }) {
+export default function LeagueTimeline({ leagueIndex, onPickIndex }) {
   const [open, setOpen] = useState(false);
   const { current, index } = trophyFromIndex(leagueIndex);
 
@@ -25,9 +25,16 @@ export default function LeagueTimeline({ leagueIndex }) {
                 type="button"
                 className="league-node-btn"
                 aria-current={here ? "step" : undefined}
-                aria-haspopup="dialog"
-                aria-label={`${tier.name} league. Show all leagues.`}
-                onClick={() => setOpen(true)}
+                aria-haspopup={onPickIndex ? undefined : "dialog"}
+                aria-label={
+                  onPickIndex
+                    ? `Show ${tier.name} league ranks`
+                    : `${tier.name} league. Show all leagues.`
+                }
+                onClick={() => {
+                  if (onPickIndex) onPickIndex(i);
+                  else setOpen(true);
+                }}
               >
                 <span className="tl-track">
                   <span className="tl-dot" aria-hidden="true" />

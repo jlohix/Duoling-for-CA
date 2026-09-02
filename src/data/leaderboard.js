@@ -100,4 +100,20 @@ export function buildCohortLeaderboard(user, progress) {
   };
 }
 
-export { DEFAULT_CLASS };
+export function buildIndividualLeaderboard(user, progress) {
+  const youName = youNameOf(user);
+  const leagues = syncLeagueSeason(progress).state.leagueIndex;
+  const ranked = rankRows(
+    listStudents(progress, { includeSynthetic: true }).map((row) =>
+      decorate(row, leagues, youName)
+    )
+  );
+  const you = ranked.find((row) => row.isYou) || null;
+  return {
+    top: ranked.slice(0, 10),
+    you,
+    youInTop: Boolean(you && you.rank <= 10),
+    youRank: you?.rank || null,
+    total: ranked.length,
+  };
+}

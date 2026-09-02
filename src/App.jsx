@@ -1,6 +1,29 @@
 import { useEffect, useMemo, useState } from "react";
-import { loadQuestions } from "./data/loadQuestions";
+import { loadQuestions, groupPastPapers, PAST_YEAR_QUESTIONS } from "./data/loadQuestions";
 import { TOPICS, lessonKey } from "./data/topics";
+import { THEVENIN_LAB_QUESTIONS, NODAL_LAB_QUESTIONS, MESH_LAB_QUESTIONS, SUPERMESH_LAB_QUESTIONS, SUPERNODE_LAB_QUESTIONS, SUPERPOS_LAB_QUESTIONS, DIVIDER_LAB_QUESTIONS, POWER_LAB_QUESTIONS, MAX_POWER_LAB_QUESTIONS, NORTON_LAB_QUESTIONS, DEPENDENT_LAB_QUESTIONS } from "./data/dragCircuits";
+import { THEVENIN_STEPS } from "./data/theveninLab";
+import { NODAL_STEPS } from "./data/nodalLab";
+import { MESH_STEPS } from "./data/meshLab";
+import { SUPERMESH_STEPS } from "./data/superMeshLab";
+import { SUPERNODE_STEPS } from "./data/superNodeLab";
+import { SUPERPOSITION_STEPS } from "./data/superpositionLab";
+import { DIVIDER_STEPS } from "./data/dividerLab";
+import { POWER_STEPS } from "./data/powerLab";
+import { MAX_POWER_STEPS } from "./data/maxPowerLab";
+import { NORTON_STEPS } from "./data/nortonLab";
+import { DEPENDENT_STEPS } from "./data/dependentLab";
+import TheveninSchematic from "./components/TheveninSchematic";
+import NortonSchematic from "./components/NortonSchematic";
+import DependentSchematic from "./components/DependentSchematic";
+import NodalSchematic from "./components/NodalSchematic";
+import MeshSchematic from "./components/MeshSchematic";
+import SuperMeshSchematic from "./components/SuperMeshSchematic";
+import SuperNodeSchematic from "./components/SuperNodeSchematic";
+import SuperpositionSchematic from "./components/SuperpositionSchematic";
+import DividerSchematic from "./components/DividerSchematic";
+import PowerSchematic from "./components/PowerSchematic";
+import MaxPowerSchematic from "./components/MaxPowerSchematic";
 import { loadProgress } from "./state/progress";
 import { skipLeagueDays, syncLeagueSeason } from "./state/league";
 import { loadSession, logout, isAdmin } from "./state/auth";
@@ -16,27 +39,24 @@ import Guide from "./pages/Guide";
 import Updates from "./pages/Updates";
 import Lesson from "./pages/Lesson";
 import SkipQuiz from "./pages/SkipQuiz";
+import DragCircuitLab from "./pages/DragCircuitLab";
+import DragDcLab from "./pages/DragDcLab";
+import InvertingOpAmpLesson from "./pages/InvertingOpAmpLesson";
+import NonInvertingOpAmpLesson from "./pages/NonInvertingOpAmpLesson";
+import LaplaceLesson from "./section5/LaplaceLesson";
 import Results from "./pages/Results";
 
 export default function App() {
   const [questions, setQuestions] = useState([]);
   const [error, setError] = useState("");
-  const [progress, setProgress] = useState(() => {
-    const loaded = loadProgress();
-    const skipKey = "circuito-league-skip-15d";
-    try {
-      if (!localStorage.getItem(skipKey)) {
-        localStorage.setItem(skipKey, "1");
-        return skipLeagueDays(loaded, 15).progress;
-      }
-    } catch {
-      /* ignore */
-    }
-    return syncLeagueSeason(loaded).progress;
-  });
+  const [progress, setProgress] = useState(
+    () => syncLeagueSeason(loadProgress()).progress
+  );
   const [screen, setScreen] = useState("home");
   const [lesson, setLesson] = useState(null);
+  const [paperPack, setPaperPack] = useState(null);
   const [skipTarget, setSkipTarget] = useState(null);
+  const [laplaceLabId, setLaplaceLabId] = useState(null);
   const [summary, setSummary] = useState(null);
   const [session, setSession] = useState(() => loadSession());
 
@@ -45,6 +65,11 @@ export default function App() {
       .then(setQuestions)
       .catch((err) => setError(err.message));
   }, []);
+
+  const pastPapers = useMemo(
+    () => groupPastPapers(PAST_YEAR_QUESTIONS),
+    []
+  );
 
   const counts = useMemo(() => {
     const map = {};
@@ -56,7 +81,14 @@ export default function App() {
   }, [questions]);
 
   if (!session) {
-    return <Login onLogin={setSession} />;
+    return (
+      <Login
+        onLogin={(next) => {
+          setSession(next);
+          setScreen(isAdmin(next) ? "admin" : "home");
+        }}
+      />
+    );
   }
 
   function handleLogout() {
@@ -65,10 +97,37 @@ export default function App() {
     setScreen("home");
   }
 
-  if (isAdmin(session)) {
+  const previewing =
+    isAdmin(session) &&
+    [
+      "home",
+      "lesson",
+      "skip",
+      "results",
+      "draglab",
+      "dragthevlab",
+      "dragnortonlab",
+      "dragdeplab",
+      "dragnodallab",
+      "dragmeshlab",
+      "dragsuperlab",
+      "dragsnlab",
+      "dragsuperposlab",
+      "dragdivlab",
+      "dragpowerlab",
+      "dragmptlab",
+      "dragdclab",
+      "invopamp",
+      "ninvopamp",
+      "laplacelab",
+      "paper",
+    ].includes(screen);
+
+  if (isAdmin(session) && !previewing) {
     const adminNav = [
       "classboard",
       "cohortboard",
+      "individualboard",
       "leagues",
       "guide",
       "updates",
@@ -87,6 +146,8 @@ export default function App() {
           <Leaderboard user={session} progress={progress} mode="class" />
         ) : adminNav === "cohortboard" ? (
           <Leaderboard user={session} progress={progress} mode="cohort" />
+        ) : adminNav === "individualboard" ? (
+          <Leaderboard user={session} progress={progress} mode="individual" />
         ) : adminNav === "leagues" ? (
           <Leagues
             user={session}
@@ -110,8 +171,10 @@ export default function App() {
     );
   }
 
+  const boardScreens = ["classboard", "cohortboard", "individualboard", "leagues", "profile", "guide", "updates"];
+
   if (error) {
-    if (screen === "guide" || screen === "updates") {
+    if (boardScreens.includes(screen)) {
       return (
         <AppShell
           nav={screen}
@@ -120,7 +183,27 @@ export default function App() {
           progress={progress}
           onLogout={handleLogout}
         >
-          {screen === "guide" ? <Guide /> : <Updates />}
+          {screen === "classboard" ? (
+            <Leaderboard user={session} progress={progress} mode="class" />
+          ) : screen === "cohortboard" ? (
+            <Leaderboard user={session} progress={progress} mode="cohort" />
+          ) : screen === "individualboard" ? (
+            <Leaderboard user={session} progress={progress} mode="individual" />
+          ) : screen === "leagues" ? (
+            <Leagues user={session} progress={progress} />
+          ) : screen === "profile" ? (
+            <Profile
+              user={session}
+              topics={TOPICS}
+              progress={progress}
+              setProgress={setProgress}
+              onPractice={() => setScreen("home")}
+            />
+          ) : screen === "guide" ? (
+            <Guide />
+          ) : (
+            <Updates />
+          )}
         </AppShell>
       );
     }
@@ -141,7 +224,7 @@ export default function App() {
   }
 
   if (!questions.length) {
-    if (screen === "guide" || screen === "updates") {
+    if (boardScreens.includes(screen)) {
       return (
         <AppShell
           nav={screen}
@@ -150,7 +233,27 @@ export default function App() {
           progress={progress}
           onLogout={handleLogout}
         >
-          {screen === "guide" ? <Guide /> : <Updates />}
+          {screen === "classboard" ? (
+            <Leaderboard user={session} progress={progress} mode="class" />
+          ) : screen === "cohortboard" ? (
+            <Leaderboard user={session} progress={progress} mode="cohort" />
+          ) : screen === "individualboard" ? (
+            <Leaderboard user={session} progress={progress} mode="individual" />
+          ) : screen === "leagues" ? (
+            <Leagues user={session} progress={progress} />
+          ) : screen === "profile" ? (
+            <Profile
+              user={session}
+              topics={TOPICS}
+              progress={progress}
+              setProgress={setProgress}
+              onPractice={() => setScreen("home")}
+            />
+          ) : screen === "guide" ? (
+            <Guide />
+          ) : (
+            <Updates />
+          )}
         </AppShell>
       );
     }
@@ -169,6 +272,211 @@ export default function App() {
     );
   }
 
+  if (screen === "draglab") {
+    return <DragCircuitLab onExit={() => setScreen("home")} />;
+  }
+
+  if (screen === "dragthevlab") {
+    return (
+      <DragCircuitLab
+        onExit={() => setScreen("home")}
+        questions={THEVENIN_LAB_QUESTIONS}
+        walkthrough={{
+          title: "Thevenin",
+          steps: THEVENIN_STEPS,
+          Schematic: TheveninSchematic,
+        }}
+      />
+    );
+  }
+
+  if (screen === "dragnortonlab") {
+    return (
+      <DragCircuitLab
+        onExit={() => setScreen("home")}
+        questions={NORTON_LAB_QUESTIONS}
+        walkthrough={{
+          title: "Norton",
+          steps: NORTON_STEPS,
+          Schematic: NortonSchematic,
+        }}
+      />
+    );
+  }
+
+  if (screen === "dragdeplab") {
+    return (
+      <DragCircuitLab
+        onExit={() => setScreen("home")}
+        questions={DEPENDENT_LAB_QUESTIONS}
+        walkthrough={{
+          title: "Dependent sources",
+          steps: DEPENDENT_STEPS,
+          Schematic: DependentSchematic,
+        }}
+      />
+    );
+  }
+
+  if (screen === "dragnodallab") {
+    return (
+      <DragCircuitLab
+        onExit={() => setScreen("home")}
+        questions={NODAL_LAB_QUESTIONS}
+        walkthrough={{
+          title: "Nodal",
+          steps: NODAL_STEPS,
+          Schematic: NodalSchematic,
+        }}
+      />
+    );
+  }
+
+  if (screen === "dragmeshlab") {
+    return (
+      <DragCircuitLab
+        onExit={() => setScreen("home")}
+        questions={MESH_LAB_QUESTIONS}
+        walkthrough={{
+          title: "Mesh",
+          steps: MESH_STEPS,
+          Schematic: MeshSchematic,
+        }}
+      />
+    );
+  }
+
+  if (screen === "dragsuperlab") {
+    return (
+      <DragCircuitLab
+        onExit={() => setScreen("home")}
+        questions={SUPERMESH_LAB_QUESTIONS}
+        walkthrough={{
+          title: "Supermesh",
+          steps: SUPERMESH_STEPS,
+          Schematic: SuperMeshSchematic,
+        }}
+      />
+    );
+  }
+
+  if (screen === "dragsnlab") {
+    return (
+      <DragCircuitLab
+        onExit={() => setScreen("home")}
+        questions={SUPERNODE_LAB_QUESTIONS}
+        walkthrough={{
+          title: "Supernode",
+          steps: SUPERNODE_STEPS,
+          Schematic: SuperNodeSchematic,
+        }}
+      />
+    );
+  }
+
+  if (screen === "dragsuperposlab") {
+    return (
+      <DragCircuitLab
+        onExit={() => setScreen("home")}
+        questions={SUPERPOS_LAB_QUESTIONS}
+        walkthrough={{
+          title: "Superposition",
+          steps: SUPERPOSITION_STEPS,
+          Schematic: SuperpositionSchematic,
+        }}
+      />
+    );
+  }
+
+  if (screen === "dragdivlab") {
+    return (
+      <DragCircuitLab
+        onExit={() => setScreen("home")}
+        questions={DIVIDER_LAB_QUESTIONS}
+        walkthrough={{
+          title: "Dividers",
+          steps: DIVIDER_STEPS,
+          Schematic: DividerSchematic,
+        }}
+      />
+    );
+  }
+
+  if (screen === "dragpowerlab") {
+    return (
+      <DragCircuitLab
+        onExit={() => setScreen("home")}
+        questions={POWER_LAB_QUESTIONS}
+        walkthrough={{
+          title: "Power",
+          steps: POWER_STEPS,
+          Schematic: PowerSchematic,
+        }}
+      />
+    );
+  }
+
+  if (screen === "dragmptlab") {
+    return (
+      <DragCircuitLab
+        onExit={() => setScreen("home")}
+        questions={MAX_POWER_LAB_QUESTIONS}
+        walkthrough={{
+          title: "Max power",
+          steps: MAX_POWER_STEPS,
+          Schematic: MaxPowerSchematic,
+        }}
+      />
+    );
+  }
+
+  if (screen === "dragdclab") {
+    return <DragDcLab onExit={() => setScreen("home")} />;
+  }
+
+  if (screen === "invopamp") {
+    return <InvertingOpAmpLesson onExit={() => setScreen("home")} />;
+  }
+
+  if (screen === "ninvopamp") {
+    return <NonInvertingOpAmpLesson onExit={() => setScreen("home")} />;
+  }
+
+  if (screen === "laplacelab" && laplaceLabId) {
+    return (
+      <LaplaceLesson
+        key={laplaceLabId}
+        labId={laplaceLabId}
+        onExit={() => {
+          setLaplaceLabId(null);
+          setScreen("home");
+        }}
+        onContinue={(id) => setLaplaceLabId(id)}
+      />
+    );
+  }
+
+  if (screen === "paper" && paperPack) {
+    return (
+      <Lesson
+        allQuestions={paperPack.questions}
+        pack={paperPack}
+        progress={progress}
+        setProgress={setProgress}
+        preview={isAdmin(session)}
+        onExit={() => {
+          setPaperPack(null);
+          setScreen("home");
+        }}
+        onFinished={(result) => {
+          setPaperPack(null);
+          setSummary(result);
+          setScreen("results");
+        }}
+      />
+    );
+  }
+
   if (screen === "lesson" && lesson) {
     return (
       <Lesson
@@ -177,6 +485,7 @@ export default function App() {
         difficulty={lesson.difficulty}
         progress={progress}
         setProgress={setProgress}
+        preview={isAdmin(session)}
         onExit={() => setScreen("home")}
         onFinished={(result) => {
           setSummary(result);
@@ -211,14 +520,39 @@ export default function App() {
       topics={TOPICS}
       progress={progress}
       counts={counts}
+      pastPapers={pastPapers}
       onStart={(topicId, difficulty) => {
         setLesson({ topicId, difficulty });
         setScreen("lesson");
+      }}
+      onStartPaper={(pack) => {
+        setPaperPack(pack);
+        setScreen("paper");
       }}
       onSkip={(topicId) => {
         setSkipTarget(topicId);
         setScreen("skip");
       }}
+      onLab={() => setScreen("draglab")}
+      onThevLab={() => setScreen("dragthevlab")}
+      onNortonLab={() => setScreen("dragnortonlab")}
+      onDepLab={() => setScreen("dragdeplab")}
+      onNodalLab={() => setScreen("dragnodallab")}
+      onMeshLab={() => setScreen("dragmeshlab")}
+      onSuperMeshLab={() => setScreen("dragsuperlab")}
+      onSuperNodeLab={() => setScreen("dragsnlab")}
+      onSuperposLab={() => setScreen("dragsuperposlab")}
+      onDividerLab={() => setScreen("dragdivlab")}
+      onPowerLab={() => setScreen("dragpowerlab")}
+      onMaxPowerLab={() => setScreen("dragmptlab")}
+      onDcLab={() => setScreen("dragdclab")}
+      onInvOpAmp={() => setScreen("invopamp")}
+      onNonInvOpAmp={() => setScreen("ninvopamp")}
+      onLaplaceLab={(id) => {
+        setLaplaceLabId(id);
+        setScreen("laplacelab");
+      }}
+      allOpen={isAdmin(session)}
     />
   );
 
@@ -226,22 +560,17 @@ export default function App() {
     main = <Leaderboard user={session} progress={progress} mode="class" />;
   } else if (screen === "cohortboard") {
     main = <Leaderboard user={session} progress={progress} mode="cohort" />;
+  } else if (screen === "individualboard") {
+    main = <Leaderboard user={session} progress={progress} mode="individual" />;
   } else if (screen === "leagues") {
-    main = (
-      <Leagues
-        user={session}
-        progress={progress}
-        onSkipDays={(days) =>
-          setProgress(skipLeagueDays(progress, days).progress)
-        }
-      />
-    );
+    main = <Leagues user={session} progress={progress} />;
   } else if (screen === "profile") {
     main = (
       <Profile
         user={session}
         topics={TOPICS}
         progress={progress}
+        setProgress={setProgress}
         onPractice={() => setScreen("home")}
       />
     );
@@ -258,6 +587,7 @@ export default function App() {
   const nav = [
     "classboard",
     "cohortboard",
+    "individualboard",
     "progress",
     "profile",
     "leagues",

@@ -1,4 +1,4 @@
-export default function CloseWarning({ open, onStay, onLeave }) {
+export default function CloseWarning({ open, onStay, onLeave, preview = false }) {
   if (!open) return null;
   return (
     <div className="overlay" onClick={onStay} role="presentation">
@@ -9,7 +9,11 @@ export default function CloseWarning({ open, onStay, onLeave }) {
         onClick={(e) => e.stopPropagation()}
       >
         <h2 id="leave-title">Leave this lesson?</h2>
-        <p>Progress in this run will be lost. XP already earned stays.</p>
+        <p>
+          {preview
+            ? "This is a staff preview. Leaving does not change student progress."
+            : "Progress in this run will be lost. XP already earned stays."}
+        </p>
         <button type="button" className="quit-btn" onClick={onLeave}>
           Leave
         </button>

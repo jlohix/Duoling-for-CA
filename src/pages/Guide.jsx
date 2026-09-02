@@ -1,11 +1,11 @@
 const STEPS = [
   {
     title: "Learn path",
-    text: "Open Learn in the sidebar. Topics unlock in order. Inside a topic, finish Easy before Average, then Challenging. Green checkmarks mean a lesson is done.",
+    text: "Open Learn in the sidebar. You see sections as cards. Open a section to walk Easy, then Average, then Challenging. Topics unlock in order. Section 1 (Basic laws) starts with circuit labs before Easy. Section 2 (Energy storage) starts with the DC C and L lab before Easy. Section 4 (Op-amps) starts with inverting and non-inverting walkthroughs before Easy. Section 5 (Laplace) starts with nine walkthroughs before Easy, ending with worked examples. Past year papers sit at the bottom of Learn for exam practice.",
   },
   {
     title: "Lessons",
-    text: "Each lesson is multiple choice. Hints are optional. Closing mid-quiz warns you that this run is lost, but XP already earned stays. Missed questions come back in a Review round.",
+    text: "Each lesson starts with a short warm-up. You can skip it and go straight to the question bank. Hints are optional. Closing mid-quiz warns you that this run is lost, but XP already earned stays. Missed questions come back in a Review round.",
   },
   {
     title: "XP",
@@ -17,7 +17,7 @@ const STEPS = [
   },
   {
     title: "Skip a locked topic",
-    text: "The next locked unit can be unlocked with a 5-question quiz. You need 4 out of 5 correct on the first try.",
+    text: "The next locked unit can be unlocked with a 5-question quiz. You need 4 out of 5 correct on the first try. A second miss ends that attempt; missed questions are not retried.",
   },
   {
     title: "Profile and Progress",
@@ -29,7 +29,7 @@ const STEPS = [
   },
   {
     title: "Class and cohort",
-    text: "Class board ranks students in your class (EE01–EE16) by total XP. Cohort board ranks those 16 classes against each other by combined XP.",
+    text: "Class board ranks students in your class (EE01–EE16) by total XP. Cohort board ranks those 16 classes by combined XP. Individual shows the top 10 students in the cohort, with your place on the last row. Your class is set by a teacher, not on Profile.",
   },
   {
     title: "Theme",

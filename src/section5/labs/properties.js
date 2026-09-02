@@ -1,0 +1,155 @@
+export const STEPS = [
+  {
+    id: "lin",
+    view: "linear",
+    highlight: "sum",
+    title: "1. Linearity",
+    body: "Transform each term, then add. Superposition still holds after you move to the frequency domain.",
+    eq: "$$\\mathcal{L}\\{a_1 f_1(t)+a_2 f_2(t)\\}=a_1 F_1(s)+a_2 F_2(s)$$",
+    check: {
+      prompt: "$\\mathcal{L}\\{3e^{-t}u(t)+2u(t)\\}$ is",
+      options: {
+        a: "$3/(s+1)+2/s$.",
+        b: "$3/(s+1)+2$.",
+        c: "$5/(s+1)$.",
+      },
+      answer: "a",
+      why: "Linearity. Height-2 step is $2/s$, not $2$ ($2$ would be $2\\delta(t)$).",
+    },
+  },
+  {
+    id: "scale",
+    view: "scale",
+    highlight: "s",
+    title: "2. Scaling",
+    body: "For $a>0$: squeeze the time waveform and the $s$-axis stretches, with a $1/a$ in front.",
+    eq: "$$\\mathcal{L}\\{f(at)\\}=\\dfrac{1}{a}F\\!\\left(\\dfrac{s}{a}\\right)$$",
+  },
+  {
+    id: "tshift",
+    view: "delay",
+    highlight: "s",
+    boardHint: "Time Shift uses e^{-as}. Frequency Shift uses F(s+a). Different.",
+    title: "3. Time Shift",
+    body: "The waveform waits until $t=a$, then copies $f$. The $u(t-a)$ is required so nothing starts before $t=a$.",
+    eq: "$$f(t-a)u(t-a)\\;\\leftrightarrow\\; e^{-as}F(s)$$",
+  },
+  {
+    id: "fshift",
+    view: "shift",
+    highlight: "s",
+    title: "4. Frequency Shift",
+    body: "A decaying envelope replaces $s$ by $s+a$. That is how $1/s$ becomes $1/(s+a)$, and how $\\cos\\omega t$ becomes the damped cosine.",
+    eq: "$$e^{-at}f(t)u(t)\\;\\leftrightarrow\\; F(s+a)$$",
+    check: {
+      prompt: "If $u(t)\\leftrightarrow 1/s$, then $e^{-4t}u(t)$ is",
+      options: {
+        a: "$1/(s+4)$.",
+        b: "$1/(s-4)$.",
+        c: "$e^{-4s}/s$.",
+      },
+      answer: "a",
+      why: "Frequency Shift: replace $s$ by $s+4$. Time Shift would have been $e^{-as}F(s)$.",
+    },
+  },
+  {
+    id: "diff",
+    view: "deriv",
+    highlight: "dt",
+    boardHint: "L{df/dt} = s F(s) − f(0⁻).",
+    title: "5. Time Differentiation",
+    body: "Those leftover values are why $i_L(0^-)$ and $v_C(0^-)$ become sources in the $s$-domain circuit.",
+    eq: [
+      "$$\\mathcal{L}\\{f'(t)\\}=sF(s)-f(0^-)$$",
+      "$$\\mathcal{L}\\{f''(t)\\}=s^2 F(s)-s f(0^-)-f'(0^-)$$",
+    ],
+  },
+  {
+    id: "derivative_rule",
+    view: "deriv",
+    highlight: "dt",
+    title: "Apply derivative property & simplify",
+    body: "Using $\\mathcal{L}\\{\\frac{d}{dt}g(t)\\} = s G(s) - g(0)$ with $g(0) = 2$. Combining terms over the common denominator gives the simplified single-fraction form.",
+    eq: "$$\\mathcal{L}\\left\\{\\dfrac{d}{dt} 2e^{-4t}\\cos(2t)\\right\\} = \\dfrac{-8s - 40}{(s + 4)^2 + 4}$$",
+    check: {
+      prompt: "What is the final numerator after combining $s G(s)$ and $-g(0)$?",
+      options: {
+        a: "$-(8s + 40)$",
+        b: "$2s^2 + 8s$",
+        c: "$-8s + 40$",
+      },
+      answer: "a",
+      why: "Subtracting $g(0) = 2$ as $2(s^2 + 8s + 20)$ cancels the $2s^2$ term, leaving $(8s - 16s - 40) = -(8s + 40)$.",
+    },
+  },
+  {
+    id: "int",
+    view: "integ",
+    highlight: "s",
+    title: "6. Time Integration",
+    body: "The unit ramp follows at once from integrating the step. A rest capacitor $v=(1/C)\\int i$ is $V=I/(sC)$.",
+    eq: [
+      "$$\\mathcal{L}\\left\\{\\int_0^t f(\\tau)\\,d\\tau\\right\\}=F(s)/s$$",
+      "$$t\\,u(t)\\;\\leftrightarrow\\; 1/s^2$$",
+    ],
+  },
+  {
+    id: "fdiff",
+    view: "freqdiff",
+    highlight: "s",
+    title: "7. Frequency Differentiation",
+    body: "That second line is the repeated-pole table row.",
+    eq: [
+      "$$t f(t)\\;\\leftrightarrow\\; -\\dfrac{dF}{ds}$$",
+      "$$t e^{-at}u(t)\\;\\leftrightarrow\\; 1/(s+a)^2$$",
+    ],
+  },
+  {
+    id: "iv",
+    view: "initfinal",
+    highlight: "all",
+    boardHint: "Final-value theorem needs a finite f(∞).",
+    title: "8. Initial and Final Value",
+    body: "Read $f(0)$ and $f(\\infty)$ from $F(s)$ without inverting, when the final limit exists. Example: $e^{-at}\\cos\\omega t\\,u(t)$ with $a>0$ has $f(\\infty)=0$.",
+    eq: [
+      "$$f(0)=\\lim_{s\\to\\infty} sF(s)$$",
+      "$$f(\\infty)=\\lim_{s\\to 0} sF(s)$$",
+    ],
+  },
+];
+
+export const PRACTICE = [
+  {
+    id: "p1",
+    prompt: "Time Shift vs Frequency Shift: $e^{-as}F(s)$ means",
+    options: {
+      a: "The signal is delayed by $a$ (and multiplied by $u(t-a)$).",
+      b: "The signal is multiplied by $e^{-at}$.",
+      c: "Every pole moved left by $a$.",
+    },
+    answer: "a",
+    why: "Time Shift $\\leftrightarrow e^{-as}F(s)$. Frequency Shift $\\leftrightarrow F(s+a)$.",
+  },
+  {
+    id: "p2",
+    prompt: "$\\mathcal{L}\\{t e^{-2t}u(t)\\}$ equals",
+    options: {
+      a: "$1/(s+2)$.",
+      b: "$1/(s+2)^2$.",
+      c: "$2/(s+2)$.",
+    },
+    answer: "b",
+    why: "Frequency Differentiation on $1/(s+2)$ gives $1/(s+2)^2$.",
+  },
+  {
+    id: "p3",
+    prompt: "The final-value theorem $f(\\infty)=\\lim_{s\\to 0}sF(s)$ needs",
+    options: {
+      a: "Nothing — it always works.",
+      b: "$f(t)$ to have a finite limit as $t\\to\\infty$.",
+      c: "The numerator degree to exceed the denominator.",
+    },
+    answer: "b",
+    why: "The limit as $t\\to\\infty$ must exist. A forever sinusoid on the $j\\omega$ axis does not settle.",
+  },
+];

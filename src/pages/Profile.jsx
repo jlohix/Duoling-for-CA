@@ -1,11 +1,12 @@
 import { visibleStreak, topicInsight } from "../state/progress";
+import { DEFAULT_CLASS, normalizeClassId } from "../data/classes";
 import TopicInsight from "../components/TopicInsight";
 import StreakNotice from "../components/StreakNotice";
 
 const STRENGTH_KINDS = new Set(["strength", "solid"]);
 const WEAK_KINDS = new Set(["weakness", "developing"]);
 
-export default function Profile({ user, topics, progress, onPractice }) {
+export default function Profile({ user, topics, progress, setProgress, onPractice }) {
   const streak = visibleStreak(progress);
   const rows = topics.map((topic) => ({
     topic,
@@ -27,9 +28,15 @@ export default function Profile({ user, topics, progress, onPractice }) {
         <div>
           <p className="eyebrow">Student</p>
           <h1>{user.username}</h1>
-          <p className="login-hint">{progress.classId || "EE01"}</p>
         </div>
       </header>
+      <p className="class-picker">
+        Your class
+        <strong>{normalizeClassId(progress.classId || DEFAULT_CLASS)}</strong>
+        <span className="login-hint">
+          Only a teacher can change this.
+        </span>
+      </p>
       <ul className="stats">
         <li>
           <strong>{progress.xp}</strong>
