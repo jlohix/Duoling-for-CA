@@ -112,6 +112,7 @@ export const STEPS = [
 export const PRACTICE = [
   {
     id: "p1",
+    view: "split",
     prompt: "For $F(s)=10s/((s+1)(s+2)(s+3))$, the residue $A$ at $s=-1$ is found by",
     options: {
       a: "Covering $(s+1)$ and evaluating at $s=-1$.",
@@ -123,6 +124,7 @@ export const PRACTICE = [
   },
   {
     id: "p2",
+    view: "trigtable",
     prompt: "An irreducible quadratic factor in $F(s)$ needs a numerator of the form",
     options: {
       a: "$Bs+C$.",
@@ -134,6 +136,7 @@ export const PRACTICE = [
   },
   {
     id: "p3",
+    view: "decay",
     prompt: "If $v(t)=(3e^{-t}+8e^{-2t}-9e^{-3t})u(t)$, then $v(\\infty)$ is",
     options: {
       a: "$0$.",
@@ -142,5 +145,29 @@ export const PRACTICE = [
     },
     answer: "a",
     why: "Every exponential dies. Steady state is $0$.",
+  },
+  {
+    id: "p4",
+    view: "deriv",
+    prompt: "An ODE with I.C.s is moved to $s$ by",
+    options: {
+      a: "Replacing $d/dt$ with $s$ and dropping $f(0^-)$.",
+      b: "Using $\\mathcal{L}\\{df/dt\\}=sF-f(0^-)$ (and the second-derivative rule if needed).",
+      c: "Setting $s=0$ first.",
+    },
+    answer: "b",
+    why: "I.C.s become extra terms on the right. Then algebra, PFE, inverse.",
+  },
+  {
+    id: "p5",
+    view: "split",
+    prompt: "Cover-up at a simple pole $s=-p$ means",
+    options: {
+      a: "Drop that $(s+p)$ factor and plug $s=-p$ into the rest.",
+      b: "Integrate $F(s)$.",
+      c: "Set the numerator to $0$.",
+    },
+    answer: "a",
+    why: "That is the residue. Numerator zeros are zeros of $F$, not residues.",
   },
 ];

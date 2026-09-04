@@ -1,6 +1,7 @@
 import { visibleStreak, topicInsight } from "../state/progress";
 import { DEFAULT_CLASS, normalizeClassId } from "../data/classes";
 import TopicInsight from "../components/TopicInsight";
+import HexStats from "../components/HexStats";
 import StreakNotice from "../components/StreakNotice";
 
 const STRENGTH_KINDS = new Set(["strength", "solid"]);
@@ -60,6 +61,11 @@ export default function Profile({ user, topics, progress, setProgress, onPractic
         Strengths and weaknesses use first-try accuracy. A topic needs at least
         3 answers before it is labeled.
       </p>
+
+      <section className="profile-card hex-stats-card">
+        <h2>Topic hex</h2>
+        <HexStats topics={topics} progress={progress} />
+      </section>
 
       <div className="profile-split">
         <section className="profile-card strengths-card">

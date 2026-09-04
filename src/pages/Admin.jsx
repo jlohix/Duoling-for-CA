@@ -11,7 +11,8 @@ import TopicInsight from "../components/TopicInsight";
 import ProgressPage from "./Progress";
 import { CLASS_IDS, DEFAULT_CLASS } from "../data/classes";
 import { trophyFromIndex } from "../data/trophies";
-import { skipLeagueDays, syncLeagueSeason } from "../state/league";
+import { syncLeagueSeason } from "../state/league";
+import { summarizeWalkFeedback } from "../data/walkTitles";
 
 function lessonTotal(counts) {
   return TOPICS.reduce(
@@ -89,20 +90,12 @@ export default function Admin({ progress, setProgress, counts }) {
           <p className="eyebrow">Staff</p>
           <h1>Students</h1>
         </div>
-        <button
-          type="button"
-          className="ghost"
-          onClick={() =>
-            setProgress(skipLeagueDays(progress, 15).progress)
-          }
-        >
-          Skip 15 days
-        </button>
       </header>
       <p className="login-hint">
         Class overview, then pick a student to view progress or adjust XP,
         streak, lessons, and first-try stats. student1 is the live learner on
-        this device. Use Add student to put a new name on the roster.
+        this device. Walkthrough thumbs from this device show under Walkthrough
+        feedback. Use Add student to put a new name on the roster.
       </p>
       <form className="admin-add" onSubmit={handleAdd}>
         <label>
@@ -191,6 +184,7 @@ export default function Admin({ progress, setProgress, counts }) {
           </tbody>
         </table>
       </div>
+      <WalkFeedbackTable students={students} />
       {student ? (
         <StudentEditor
           key={student.username}
@@ -209,6 +203,63 @@ export default function Admin({ progress, setProgress, counts }) {
         />
       ) : null}
     </div>
+  );
+}
+
+function WalkFeedbackTable({ students }) {
+  const rows = useMemo(() => summarizeWalkFeedback(students), [students]);
+  const voted = rows.filter((row) => row.up + row.down > 0);
+  const up = voted.reduce((sum, row) => sum + row.up, 0);
+  const down = voted.reduce((sum, row) => sum + row.down, 0);
+  return (
+    <section className="admin-walk-feedback">
+      <h2>Walkthrough feedback</h2>
+      <p className="login-hint">
+        Thumbs from this device's live learner (student1). Other roster names
+        do not vote here.
+      </p>
+      <p className="login-hint">
+        {up} thumbs up · {down} thumbs down
+      </p>
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Walkthrough</th>
+              <th>👍</th>
+              <th>👎</th>
+              <th>From</th>
+            </tr>
+          </thead>
+          <tbody>
+            {voted.length ? (
+              voted.map((row) => (
+                <tr key={row.key}>
+                  <td>
+                    {row.section ? `Section ${row.section} · ` : ""}
+                    {row.title}
+                  </td>
+                  <td>{row.up}</td>
+                  <td>{row.down}</td>
+                  <td>
+                    {row.voters
+                      .map((who) => `${who.name} ${who.vote === "up" ? "👍" : "👎"}`)
+                      .join(", ")}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4}>
+                  No thumbs yet. Finish a walkthrough on this device and tap
+                  thumbs up or thumbs down.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }
 

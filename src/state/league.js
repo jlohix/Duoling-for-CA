@@ -224,20 +224,6 @@ export function syncLeagueSeason(liveProgress) {
   return { progress, state };
 }
 
-export function skipLeagueDays(liveProgress, days = 15) {
-  const students = listStudents(liveProgress);
-  const ms = Math.max(0, Number(days) || 0) * 24 * 60 * 60 * 1000;
-  let state = loadState();
-  if (!state) {
-    state = { seasonStart: Date.now(), ...snapshot(students, {}) };
-  }
-  saveState({
-    ...state,
-    seasonStart: Number(state.seasonStart) - ms,
-  });
-  return syncLeagueSeason(liveProgress);
-}
-
 export function formatRemain(ms) {
   const value = Math.max(0, ms);
   const days = Math.floor(value / 86400000);

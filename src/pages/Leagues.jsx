@@ -17,7 +17,7 @@ function StreakCell({ streak }) {
   );
 }
 
-export default function Leagues({ user, progress, onSkipDays }) {
+export default function Leagues({ user, progress }) {
   const admin = isAdmin(user);
   const [now, setNow] = useState(Date.now());
   const [viewIndex, setViewIndex] = useState(
@@ -54,18 +54,6 @@ export default function Leagues({ user, progress, onSkipDays }) {
         </div>
         <div className="league-timer">
           {formatRemain(Math.max(0, board.remainMs - (Date.now() - now)))}
-          {onSkipDays ? (
-            <button
-              type="button"
-              className="ghost"
-              onClick={() => {
-                onSkipDays(15);
-                setNow(Date.now());
-              }}
-            >
-              Skip 15 days
-            </button>
-          ) : null}
         </div>
       </header>
       <TrophyCard

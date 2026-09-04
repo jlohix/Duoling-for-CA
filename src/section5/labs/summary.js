@@ -85,6 +85,7 @@ export const STEPS = [
 export const PRACTICE = [
   {
     id: "p1",
+    view: "table",
     prompt: "The inverse of $1$ is",
     options: {
       a: "The unit impulse $\\delta(t)$.",
@@ -96,6 +97,7 @@ export const PRACTICE = [
   },
   {
     id: "p2",
+    view: "trigtable",
     prompt: "$\\cos 3t\\,u(t)$ matches",
     options: {
       a: "$3/(s^2+9)$.",
@@ -107,6 +109,7 @@ export const PRACTICE = [
   },
   {
     id: "p3",
+    view: "guide",
     prompt: "To invert a circuit $V(s)$ you",
     options: {
       a: "Evaluate the Bromwich integral by hand.",
@@ -115,5 +118,29 @@ export const PRACTICE = [
     },
     answer: "b",
     why: "Partial fractions, then match the table.",
+  },
+  {
+    id: "p4",
+    view: "table",
+    prompt: "The inverse of $1/s$ is",
+    options: {
+      a: "$\\delta(t)$.",
+      b: "$u(t)$.",
+      c: "$t\\,u(t)$.",
+    },
+    answer: "b",
+    why: "Unit step $\\leftrightarrow 1/s$. Impulse $\\leftrightarrow 1$. Ramp $\\leftrightarrow 1/s^2$.",
+  },
+  {
+    id: "p5",
+    view: "trigtable",
+    prompt: "$\\sin 3t\\,u(t)$ matches",
+    options: {
+      a: "$s/(s^2+9)$.",
+      b: "$1/(s+3)$.",
+      c: "$3/(s^2+9)$.",
+    },
+    answer: "c",
+    why: "Sine has $\\omega$ on top. Cosine keeps $s$ on top.",
   },
 ];

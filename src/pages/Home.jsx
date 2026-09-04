@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { DIFFICULTIES, lessonKey } from "../data/topics";
 import { LAPLACE_LABS } from "../section5";
+import { SECTION2_LABS } from "../section2/index.jsx";
+import { SECTION3_LABS } from "../section3/index.jsx";
+import { SECTION4_LABS } from "../section4/index.jsx";
 import {
   isTopicUnlocked,
   isLessonUnlocked,
@@ -76,16 +79,19 @@ function SectionCard({
   meter,
   current,
   skipReady,
+  showMeter = true,
   onOpen,
   onJump,
 }) {
-  const cta = !unlocked
-    ? `Jump to section ${index}`
-    : meter.pct >= 100
-      ? "Review"
-      : meter.pct > 0
-        ? "Continue"
-        : "Start";
+  const cta = !showMeter
+    ? "Open"
+    : !unlocked
+      ? `Jump to section ${index}`
+      : meter.pct >= 100
+        ? "Review"
+        : meter.pct > 0
+          ? "Continue"
+          : "Start";
   return (
     <article
       className={`section-card ${unlocked ? "" : "locked"} ${current ? "current" : ""}`}
@@ -93,7 +99,7 @@ function SectionCard({
       <div className="section-copy">
         <p className="eyebrow">{kicker}</p>
         <h2>{title}</h2>
-        {unlocked ? (
+        {showMeter && unlocked ? (
           <div className="section-meter">
             <div className="meter">
               <div className="meter-fill" style={{ width: `${meter.pct}%` }} />
@@ -103,11 +109,11 @@ function SectionCard({
               🏆
             </span>
           </div>
-        ) : (
+        ) : showMeter ? (
           <p className="section-lock-meta">
             🔒 {meter.total} {meter.total === 1 ? "unit" : "units"}
           </p>
-        )}
+        ) : null}
         <button
           type="button"
           className={unlocked && current ? "section-cta" : "section-cta ghost"}
@@ -202,6 +208,33 @@ function LawsLabs({ unlocked, labs }) {
   );
 }
 
+function SectionWalks({ labs, unlocked, onOpen }) {
+  const off = unlocked ? "" : "off";
+  return (
+    <>
+      {labs.map((lab) => (
+        <button
+          key={lab.id}
+          type="button"
+          className={`node ${off}`}
+          disabled={!unlocked}
+          onClick={() => onOpen(lab.id)}
+        >
+          <span className="node-icon">{lab.icon}</span>
+          <span className="node-name">{lab.title}</span>
+          <span className="node-count">{lab.count}</span>
+        </button>
+      ))}
+    </>
+  );
+}
+
+const SECTION_LAB_LISTS = {
+  2: SECTION2_LABS,
+  3: SECTION3_LABS,
+  4: SECTION4_LABS,
+};
+
 function LaplaceLabs({ unlocked, onLaplaceLab }) {
   const off = unlocked ? "" : "off";
   return (
@@ -233,20 +266,17 @@ function TopicLadder({
   onStart,
   onBack,
   onAskSkip,
-  onInvOpAmp,
-  onNonInvOpAmp,
-  onDcLab,
   onLaplaceLab,
+  onSectionWalk,
   labs,
   allOpen = false,
 }) {
   const firstAvailable = DIFFICULTIES.find(
     (d) => (counts[lessonKey(topic.id, d.id)] || 0) > 0
   );
-  const showOpAmpWalks = topic.id === 4;
   const showLawsLabs = topic.id === 1;
-  const showEnergyLabs = topic.id === 2;
   const showLaplaceWalks = topic.id === 5;
+  const sectionWalks = SECTION_LAB_LISTS[topic.id];
   return (
     <DoodlePage>
     <div className="page">
@@ -260,51 +290,24 @@ function TopicLadder({
         </div>
       </header>
       <p className="login-hint">{topic.blurb}</p>
-      <TopicInsight insight={topicInsight(progress, topic.id)} compact />
+      {allOpen ? null : (
+        <TopicInsight insight={topicInsight(progress, topic.id)} compact />
+      )}
       <ol className="path ladder-path">
         <li className={`unit ${unlocked ? "" : "locked"} ${isSkipTarget ? "skip-ready" : ""}`}>
           <div className="nodes">
             {showLawsLabs ? <LawsLabs unlocked={unlocked} labs={labs} /> : null}
-            {showEnergyLabs ? (
-              <button
-                type="button"
-                className={`node ${unlocked ? "" : "off"}`}
-                disabled={!unlocked}
-                onClick={onDcLab}
-              >
-                <span className="node-icon">DC</span>
-                <span className="node-name">C and L</span>
-                <span className="node-count">4 Qs</span>
-              </button>
+            {sectionWalks ? (
+              <SectionWalks
+                labs={sectionWalks}
+                unlocked={unlocked}
+                onOpen={(id) => onSectionWalk(topic.id, id)}
+              />
             ) : null}
             {showLaplaceWalks ? (
               <LaplaceLabs unlocked={unlocked} onLaplaceLab={onLaplaceLab} />
             ) : null}
-            {showOpAmpWalks ? (
-              <>
-                <button
-                  type="button"
-                  className={`node ${unlocked ? "" : "off"}`}
-                  disabled={!unlocked}
-                  onClick={onInvOpAmp}
-                >
-                  <span className="node-icon">−G</span>
-                  <span className="node-name">Inverting amp</span>
-                  <span className="node-count">Walkthrough</span>
-                </button>
-                <button
-                  type="button"
-                  className={`node ${unlocked ? "" : "off"}`}
-                  disabled={!unlocked}
-                  onClick={onNonInvOpAmp}
-                >
-                  <span className="node-icon">+G</span>
-                  <span className="node-name">Non-inv. amp</span>
-                  <span className="node-count">Walkthrough</span>
-                </button>
-              </>
-            ) : null}
-            {showLawsLabs || showEnergyLabs || showLaplaceWalks || showOpAmpWalks ? (
+            {showLawsLabs || showLaplaceWalks || sectionWalks ? (
               <p className="path-quiz-mark">
                 Test your knowledge for all the walkthroughs
               </p>
@@ -378,6 +381,7 @@ export default function Home({
   onInvOpAmp,
   onNonInvOpAmp,
   onLaplaceLab,
+  onSectionWalk,
   allOpen = false,
 }) {
   const [section, setSection] = useState(null);
@@ -463,6 +467,42 @@ export default function Home({
     );
   }
 
+  if (section === "labs") {
+    return (
+      <DoodlePage>
+        <div className="page">
+        <header className="topbar">
+          <div>
+            <button
+              type="button"
+              className="ghost back-link"
+              onClick={() => setSection(null)}
+            >
+              ← Back
+            </button>
+            <p className="eyebrow">Try it</p>
+            <h1>Try-it labs</h1>
+          </div>
+        </header>
+        <p className="login-hint">
+          No XP. DC capacitors and inductors.
+        </p>
+        <ol className="path ladder-path">
+          <li className="unit lab-unit">
+            <div className="nodes">
+              <button type="button" className="node" onClick={onDcLab}>
+                <span className="node-icon">DC</span>
+                <span className="node-name">C and L</span>
+                <span className="node-count">4 Qs</span>
+              </button>
+            </div>
+          </li>
+        </ol>
+        </div>
+      </DoodlePage>
+    );
+  }
+
   if (section != null) {
     const index = topics.findIndex((t) => t.id === section);
     const topic = topics[index];
@@ -479,10 +519,8 @@ export default function Home({
             onStart={onStart}
             onBack={() => setSection(null)}
             onAskSkip={() => setEventOpen(true)}
-            onInvOpAmp={onInvOpAmp}
-            onNonInvOpAmp={onNonInvOpAmp}
-            onDcLab={onDcLab}
             onLaplaceLab={onLaplaceLab}
+            onSectionWalk={onSectionWalk}
             labs={{
               onLab,
               onDividerLab,
@@ -529,6 +567,20 @@ export default function Home({
         </p>
       ) : null}
       <div className="section-list">
+        <SectionCard
+          kicker="Try it"
+          title="Try-it labs"
+          blurb="DC C and L."
+          index={0}
+          badge="★"
+          unlocked
+          showMeter={!allOpen}
+          meter={{ done: 0, total: 1, pct: 0 }}
+          current
+          skipReady={false}
+          onOpen={() => setSection("labs")}
+          onJump={() => setSection("labs")}
+        />
         {topics.map((topic, index) => {
           const unlocked = allOpen || isTopicUnlocked(index, progress, counts);
           const meter = topicMeter(topic, progress, counts);
@@ -541,6 +593,7 @@ export default function Home({
               blurb={topic.blurb}
               index={index + 1}
               unlocked={unlocked}
+              showMeter={!allOpen}
               meter={meter}
               current={index === currentIndex}
               skipReady={skipReady}
@@ -560,6 +613,7 @@ export default function Home({
           index={topics.length + 1}
           badge="PY"
           unlocked
+          showMeter={!allOpen}
           meter={{
             done: pastPapers.filter((p) => progress.completed?.includes(p.id))
               .length,

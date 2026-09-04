@@ -1,6 +1,7 @@
 import { DIFFICULTIES, lessonKey } from "../data/topics";
 import { visibleStreak, topicInsight } from "../state/progress";
 import TopicInsight from "../components/TopicInsight";
+import HexStats from "../components/HexStats";
 
 export default function ProgressPage({
   topics,
@@ -83,6 +84,10 @@ export default function ProgressPage({
           this in.
         </p>
       )}
+      <section className="profile-card hex-stats-card">
+        <h2>Topic hex</h2>
+        <HexStats topics={topics} progress={progress} />
+      </section>
       <ol className="progress-topics">
         {insights.map(({ topic, insight }) => (
           <li key={topic.id} className="progress-topic">

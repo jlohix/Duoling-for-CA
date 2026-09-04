@@ -56,7 +56,7 @@ export const MAX_POWER_STEPS = [
     view: "match",
     highlight: "load",
     title: "Your turn",
-    body: "This lab is DC only. Pick the matching $R_L$, or pick $P_{\\max}$ from $V^2 / (4 R_s)$. No XP.",
+    body: "This lab is DC only. Pick the matching $R_L$, or pick $P_{\\max}$ from $V^2 / (4 R_s)$.",
     eq: "Match $R_L$ to $R_s$, then $P_{\\max} = V^2 / (4 R_s)$",
   },
 ];

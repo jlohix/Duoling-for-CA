@@ -65,24 +65,6 @@ export const STEPS = [
     ],
   },
   {
-    id: "derivative_rule",
-    view: "deriv",
-    highlight: "dt",
-    title: "Apply derivative property & simplify",
-    body: "Using $\\mathcal{L}\\{\\frac{d}{dt}g(t)\\} = s G(s) - g(0)$ with $g(0) = 2$. Combining terms over the common denominator gives the simplified single-fraction form.",
-    eq: "$$\\mathcal{L}\\left\\{\\dfrac{d}{dt} 2e^{-4t}\\cos(2t)\\right\\} = \\dfrac{-8s - 40}{(s + 4)^2 + 4}$$",
-    check: {
-      prompt: "What is the final numerator after combining $s G(s)$ and $-g(0)$?",
-      options: {
-        a: "$-(8s + 40)$",
-        b: "$2s^2 + 8s$",
-        c: "$-8s + 40$",
-      },
-      answer: "a",
-      why: "Subtracting $g(0) = 2$ as $2(s^2 + 8s + 20)$ cancels the $2s^2$ term, leaving $(8s - 16s - 40) = -(8s + 40)$.",
-    },
-  },
-  {
     id: "int",
     view: "integ",
     highlight: "s",
@@ -121,6 +103,7 @@ export const STEPS = [
 export const PRACTICE = [
   {
     id: "p1",
+    view: "delay",
     prompt: "Time Shift vs Frequency Shift: $e^{-as}F(s)$ means",
     options: {
       a: "The signal is delayed by $a$ (and multiplied by $u(t-a)$).",
@@ -132,6 +115,7 @@ export const PRACTICE = [
   },
   {
     id: "p2",
+    view: "freqdiff",
     prompt: "$\\mathcal{L}\\{t e^{-2t}u(t)\\}$ equals",
     options: {
       a: "$1/(s+2)$.",
@@ -143,6 +127,7 @@ export const PRACTICE = [
   },
   {
     id: "p3",
+    view: "initfinal",
     prompt: "The final-value theorem $f(\\infty)=\\lim_{s\\to 0}sF(s)$ needs",
     options: {
       a: "Nothing — it always works.",
@@ -151,5 +136,29 @@ export const PRACTICE = [
     },
     answer: "b",
     why: "The limit as $t\\to\\infty$ must exist. A forever sinusoid on the $j\\omega$ axis does not settle.",
+  },
+  {
+    id: "p4",
+    view: "shift",
+    prompt: "Frequency Shift: $F(s+a)$ means $f(t)$ is multiplied by",
+    options: {
+      a: "$u(t-a)$.",
+      b: "$e^{-at}$.",
+      c: "$t$.",
+    },
+    answer: "b",
+    why: "$e^{-at}f(t)\\leftrightarrow F(s+a)$. Delay in time is $e^{-as}F(s)$.",
+  },
+  {
+    id: "p5",
+    view: "deriv",
+    prompt: "Differentiation in time: $\\mathcal{L}\\{df/dt\\}$ is",
+    options: {
+      a: "$sF(s)-f(0^-)$.",
+      b: "$F(s)/s$.",
+      c: "$-dF/ds$.",
+    },
+    answer: "a",
+    why: "The $f(0^-)$ term folds in the I.C. Integration in $t$ is closer to $F/s$. $-dF/ds$ is multiply by $t$.",
   },
 ];

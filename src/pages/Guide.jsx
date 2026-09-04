@@ -1,7 +1,7 @@
 const STEPS = [
   {
     title: "Learn path",
-    text: "Open Learn in the sidebar. You see sections as cards. Open a section to walk Easy, then Average, then Challenging. Topics unlock in order. Section 1 (Basic laws) starts with circuit labs before Easy. Section 2 (Energy storage) starts with the DC C and L lab before Easy. Section 4 (Op-amps) starts with inverting and non-inverting walkthroughs before Easy. Section 5 (Laplace) starts with nine walkthroughs before Easy, ending with worked examples. Past year papers sit at the bottom of Learn for exam practice.",
+    text: "Open Learn in the sidebar. You see sections as cards: Basic laws, Op-amps, Transients, First-order circuits, Laplace transforms, Network functions, and Frequency domain. Open a section to walk Easy, then Average, then Challenging. Topics unlock in order. Basic laws has Ohm through Superposition walkthroughs before Easy. Op-amps has the op-amp walkthroughs. Laplace transforms starts with walkthroughs before Easy; each walkthrough ends on its own complete screen. Past year papers sit at the bottom of Learn for exam practice.",
   },
   {
     title: "Lessons",
@@ -9,7 +9,7 @@ const STEPS = [
   },
   {
     title: "XP",
-    text: "Correct first-try answers pay 10 XP on Easy, 20 on Average, and 30 on Challenging. Finishing the lesson adds 20 / 40 / 60 XP. Replaying a finished lesson is practice only (no extra XP).",
+    text: "Correct first-try answers pay 10 XP on Easy, 20 on Average, and 30 on Challenging. Finishing the lesson adds 20 / 40 / 60 XP. Walkthroughs and try-it labs use Easy rates (10 per first correct check, 20 to finish). Replaying a finished lesson is practice only (no extra XP).",
   },
   {
     title: "Streak",
@@ -21,7 +21,7 @@ const STEPS = [
   },
   {
     title: "Profile and Progress",
-    text: "Profile lists strengths (about 80%+ first try) and weaknesses (under 60%) after at least 3 answers. Progress shows every topic and your strongest / focus area.",
+    text: "Profile lists strengths (about 80%+ first try) and weaknesses (under 60%) after at least 3 answers, plus a hex chart of first-try accuracy on every topic. Progress shows the same hex for that student, every topic, and your strongest / focus area.",
   },
   {
     title: "Trophy leagues",

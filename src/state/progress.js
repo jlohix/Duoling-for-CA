@@ -28,6 +28,7 @@ function emptyState() {
     topicStats: {},
     leagueIndex: 0,
     classId: DEFAULT_CLASS,
+    walkFeedback: {},
   };
 }
 
@@ -116,6 +117,15 @@ function parseTopicStats(raw) {
   return out;
 }
 
+function parseWalkFeedback(raw) {
+  if (!raw || typeof raw !== "object") return {};
+  const out = {};
+  for (const [id, vote] of Object.entries(raw)) {
+    if (vote === "up" || vote === "down") out[id] = vote;
+  }
+  return out;
+}
+
 export function loadProgress() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -134,6 +144,7 @@ export function loadProgress() {
         ? Number(data.leagueIndex)
         : 0,
       classId: normalizeClassId(data.classId),
+      walkFeedback: parseWalkFeedback(data.walkFeedback),
     };
   } catch {
     return emptyState();
@@ -145,6 +156,16 @@ function saveProgress(state) {
 }
 
 export { saveProgress };
+
+export function recordWalkFeedback(state, lessonKey, vote) {
+  if (!lessonKey || (vote !== "up" && vote !== "down")) return state;
+  const next = {
+    ...state,
+    walkFeedback: { ...(state.walkFeedback || {}), [lessonKey]: vote },
+  };
+  saveProgress(next);
+  return next;
+}
 
 export function recordFirstTry(state, topicId, ok) {
   if (!topicId) return state;
@@ -230,6 +251,79 @@ export function addXp(state, amount) {
   const next = { ...state, xp: state.xp + amount };
   saveProgress(next);
   return next;
+}
+
+export function walkLessonKey(section, labId) {
+  return `walk-${section}-${labId}`;
+}
+
+export function payGuidedCheck(
+  setProgress,
+  { preview, xpEach, ok, firstTry, topicId, paidRef, xpRef, id }
+) {
+  if (preview || !setProgress) return;
+  const award = Boolean(ok && xpEach && id && !paidRef.current.has(id));
+  if (award) {
+    paidRef.current.add(id);
+    xpRef.current += xpEach;
+  }
+  if (!award && !(firstTry && topicId)) return;
+  setProgress((p) => {
+    let next = p;
+    if (firstTry && topicId) next = recordFirstTry(next, topicId, ok);
+    if (award) next = addXp(next, xpEach);
+    return next;
+  });
+}
+
+export function finishGuidedLesson({
+  preview,
+  progress,
+  setProgress,
+  key,
+  xpFromChecks,
+  correct,
+  total,
+  topicName,
+  difficultyName = "Walkthrough",
+  kind = "walk",
+  onFinished,
+}) {
+  const base = {
+    kind,
+    status: "complete",
+    correct,
+    total,
+    topicName,
+    difficultyName,
+    lessonKey: key,
+  };
+  if (preview || !setProgress) {
+    onFinished?.({
+      ...base,
+      xpGained: 0,
+      streak: visibleStreak(progress),
+      streakFrom: visibleStreak(progress),
+      streakGrew: false,
+    });
+    return;
+  }
+  const alreadyDone = Boolean(progress?.completed?.includes(key));
+  const bonus = alreadyDone ? 0 : XP_LESSON_BONUS;
+  const grew = wouldExtendStreak(progress);
+  const streakFrom = visibleStreak(progress);
+  let next = progress;
+  setProgress((p) => {
+    next = completeLesson(p, key, XP_LESSON_BONUS);
+    return next;
+  });
+  onFinished?.({
+    ...base,
+    xpGained: xpFromChecks + bonus,
+    streak: visibleStreak(next),
+    streakFrom,
+    streakGrew: grew,
+  });
 }
 
 export function completeLesson(state, key, bonus = XP_LESSON_BONUS) {

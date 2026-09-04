@@ -2,6 +2,11 @@ import { useMemo, useRef, useState } from "react";
 import { DC_LAB_QUESTIONS, DC_PARTS } from "../data/dcLab";
 import PartSymbol from "../components/PartSymbol";
 import ThemeSwitch from "../components/ThemeSwitch";
+import {
+  XP_CORRECT,
+  finishGuidedLesson,
+  payGuidedCheck,
+} from "../state/progress";
 
 const MODE_KEY = "circuito-dc-lab-mode-v1";
 
@@ -38,7 +43,15 @@ function PartChip({ part, hard, onPointerDown, onPick, disabled }) {
   );
 }
 
-export default function DragDcLab({ onExit }) {
+export default function DragDcLab({
+  onExit,
+  onFinished,
+  progress,
+  setProgress,
+  preview = false,
+  walkKey = "walk-lab-dc",
+  topicId = 3,
+}) {
   const queue = useMemo(() => shuffle(DC_LAB_QUESTIONS), []);
   const [index, setIndex] = useState(0);
   const [placed, setPlaced] = useState(null);
@@ -50,6 +63,11 @@ export default function DragDcLab({ onExit }) {
   const [mode, setMode] = useState(loadMode);
   const slotRef = useRef(null);
   const dragRef = useRef(null);
+  const attemptedRef = useRef(new Set());
+  const paidRef = useRef(new Set());
+  const xpRef = useRef(0);
+  const alreadyDone = Boolean(progress?.completed?.includes(walkKey));
+  const xpEach = preview || alreadyDone ? 0 : XP_CORRECT;
   const hard = mode === "hard";
   const question = queue[index];
   const choices = useMemo(() => shuffle(DC_PARTS), [question?.id]);
@@ -118,14 +136,47 @@ export default function DragDcLab({ onExit }) {
   function check() {
     if (!placed || revealed) return;
     const pass = placed === question.correct;
+    const checkId = question.id || `q-${index}`;
+    const firstTry = !attemptedRef.current.has(checkId);
+    attemptedRef.current.add(checkId);
     setOk(pass);
     setRevealed(true);
     if (pass) setScore((n) => n + 1);
+    payGuidedCheck(setProgress, {
+      preview,
+      xpEach,
+      ok: pass,
+      firstTry,
+      topicId,
+      paidRef,
+      xpRef,
+      id: `lab-${checkId}`,
+    });
+  }
+
+  function completeLab(okCount) {
+    if (onFinished) {
+      finishGuidedLesson({
+        preview,
+        progress,
+        setProgress,
+        key: walkKey,
+        xpFromChecks: xpRef.current,
+        correct: okCount,
+        total: queue.length,
+        topicName: "C and L",
+        difficultyName: "Lab",
+        kind: "lab",
+        onFinished,
+      });
+      return;
+    }
+    setDone(true);
   }
 
   function next() {
     if (index + 1 >= queue.length) {
-      setDone(true);
+      completeLab(score);
       return;
     }
     setIndex((n) => n + 1);
@@ -140,8 +191,7 @@ export default function DragDcLab({ onExit }) {
           <ThemeSwitch />
         </header>
         <p>
-          You placed {score}/{queue.length} equivalents correctly. No XP for
-          this try-it lab.
+          You placed {score}/{queue.length} equivalents correctly.
         </p>
         <button type="button" className="primary" onClick={onExit}>
           Back to Learn
@@ -163,6 +213,11 @@ export default function DragDcLab({ onExit }) {
         </button>
         <p className="lesson-meta">
           DC lab · {index + 1}/{queue.length}
+          {preview
+            ? " · staff preview · no XP"
+            : xpEach
+              ? ` · +${xpEach} XP`
+              : " · practice"}
         </p>
         <ThemeSwitch compact />
       </header>

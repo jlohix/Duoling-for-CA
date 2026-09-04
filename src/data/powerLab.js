@@ -48,7 +48,7 @@ export const POWER_STEPS = [
     view: "dc",
     highlight: "p",
     title: "Your turn",
-    body: "This lab is DC only. Pick $P$ from $VI$, from $I^2 R$, or from $V^2 / R$. No XP.",
+    body: "This lab is DC only. Pick $P$ from $VI$, from $I^2 R$, or from $V^2 / R$.",
     eq: "Pick $P$ from the labels on the sketch",
   },
 ];

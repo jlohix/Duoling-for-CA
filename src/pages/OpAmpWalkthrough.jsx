@@ -3,6 +3,12 @@ import { ColourCodeKey, ResistorBody } from "../data/resistorBands";
 import MathText from "../components/MathText";
 import ThemeSwitch from "../components/ThemeSwitch";
 import LabTeach from "../components/LabTeach";
+import WalkRating from "../components/WalkRating";
+import {
+  XP_CORRECT,
+  finishGuidedLesson,
+  payGuidedCheck,
+} from "../state/progress";
 
 const MODE_KEY = "circuito-lab-mode-v1";
 
@@ -45,6 +51,8 @@ function PracticeView({
   caption,
   onExit,
   onDone,
+  onCheck,
+  xpHint,
 }) {
   const queue = useMemo(() => shuffle(practice), [practice]);
   const [index, setIndex] = useState(0);
@@ -56,6 +64,7 @@ function PracticeView({
   const [mode, setMode] = useState(loadMode);
   const slotRef = useRef(null);
   const dragRef = useRef(null);
+  const attemptedRef = useRef(new Set());
   const hard = mode === "hard";
   const question = queue[index];
   const choices = useMemo(
@@ -126,9 +135,13 @@ function PracticeView({
   function check() {
     if (placed == null || revealed) return;
     const pass = placed === question.correctOhm;
+    const checkId = question.id || `q-${index}`;
+    const firstTry = !attemptedRef.current.has(checkId);
+    attemptedRef.current.add(checkId);
     setOk(pass);
     setRevealed(true);
     if (pass) setScore((n) => n + 1);
+    onCheck?.({ ok: pass, firstTry, id: `practice-${checkId}` });
   }
 
   function next() {
@@ -153,6 +166,7 @@ function PracticeView({
         </button>
         <p className="lesson-meta">
           {title} · Drop Rf · {index + 1}/{queue.length}
+          {xpHint ? ` · ${xpHint}` : ""}
         </p>
         <ThemeSwitch compact />
       </header>
@@ -253,15 +267,62 @@ export default function OpAmpWalkthrough({
   practice,
   Schematic,
   onExit,
+  onFinished,
+  progress,
+  setProgress,
+  preview = false,
+  walkKey,
+  topicId = 3,
 }) {
   const [stage, setStage] = useState("teach");
   const [score, setScore] = useState(null);
+  const paidRef = useRef(new Set());
+  const xpRef = useRef(0);
+  const alreadyDone = Boolean(progress?.completed?.includes(walkKey));
+  const xpEach = preview || alreadyDone ? 0 : XP_CORRECT;
+  const xpHint = preview
+    ? "staff preview · no XP"
+    : xpEach
+      ? `+${xpEach} XP`
+      : "practice";
+
+  function payCheck(outcome) {
+    payGuidedCheck(setProgress, {
+      preview,
+      xpEach,
+      topicId,
+      paidRef,
+      xpRef,
+      ...outcome,
+    });
+  }
+
+  function completeRun(ok, total) {
+    if (onFinished) {
+      finishGuidedLesson({
+        preview,
+        progress,
+        setProgress,
+        key: walkKey,
+        xpFromChecks: xpRef.current,
+        correct: ok,
+        total,
+        topicName: title,
+        difficultyName: "Walkthrough",
+        kind: "walk",
+        onFinished,
+      });
+      return;
+    }
+    setScore({ ok, total });
+    setStage("done");
+  }
 
   if (stage === "done") {
     return (
       <div className="page results">
         <header className="topbar">
-          <h1>{title}</h1>
+          <h1>Walkthrough completed</h1>
           <ThemeSwitch />
         </header>
         <p className="focus-eq">
@@ -269,8 +330,13 @@ export default function OpAmpWalkthrough({
         </p>
         <p>
           You placed {score.ok}/{score.total} feedback resistors correctly.{" "}
-          {doneBlurb} No XP for this try-it lesson.
+          {doneBlurb}
         </p>
+        <WalkRating
+          lessonKey={walkKey}
+          progress={progress}
+          setProgress={setProgress}
+        />
         <button type="button" className="primary" onClick={onExit}>
           Back to Learn
         </button>
@@ -285,11 +351,10 @@ export default function OpAmpWalkthrough({
         practice={practice}
         Schematic={Schematic}
         caption={caption}
+        xpHint={xpHint}
         onExit={onExit}
-        onDone={(ok, total) => {
-          setScore({ ok, total });
-          setStage("done");
-        }}
+        onCheck={payCheck}
+        onDone={completeRun}
       />
     );
   }
@@ -300,8 +365,10 @@ export default function OpAmpWalkthrough({
       steps={steps}
       Schematic={Schematic}
       practiceLabel="Try Rf"
+      skipLabel="Skip walkthrough"
       onExit={onExit}
       onPractice={() => setStage("practice")}
+      onCheck={payCheck}
     />
   );
 }

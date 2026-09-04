@@ -2,7 +2,7 @@ import { INVERTING_PRACTICE, INVERTING_STEPS } from "../data/invertingOpAmp";
 import { InvertingSchematic } from "../components/OpAmpSchematics";
 import OpAmpWalkthrough from "./OpAmpWalkthrough";
 
-export default function InvertingOpAmpLesson({ onExit }) {
+export default function InvertingOpAmpLesson({ onExit, ...rest }) {
   return (
     <OpAmpWalkthrough
       title="Inverting amp"
@@ -13,6 +13,7 @@ export default function InvertingOpAmpLesson({ onExit }) {
       practice={INVERTING_PRACTICE}
       Schematic={InvertingSchematic}
       onExit={onExit}
+      {...rest}
     />
   );
 }

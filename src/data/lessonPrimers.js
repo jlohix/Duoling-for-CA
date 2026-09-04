@@ -155,62 +155,53 @@ const WARMUPS = {
     },
   ],
   2: [
-    () => {
-      const c = pick([1, 2, 4]);
-      const dvdt = pick([2, 3, 5, 6]);
-      const i = c * dvdt;
-      return makeMcq(
-        "w2-ic",
-        `$C = ${c}\\ \\mathrm{F}$ and $dv/dt = ${dvdt}\\ \\mathrm{V/s}$. What is $i_C$?`,
-        u(i, "A"),
-        [u(c / dvdt, "A"), u(dvdt / c, "A"), u(c + dvdt, "A")],
-        `$i_C = C\\,dv/dt = ${c} \\times ${dvdt} = ${i}\\ \\mathrm{A}$.`
-      );
-    },
-    () => {
-      const l = pick([1, 2, 4]);
-      const didt = pick([2, 3, 5]);
-      const v = l * didt;
-      return makeMcq(
-        "w2-vl",
-        `$L = ${l}\\ \\mathrm{H}$ and $di/dt = ${didt}\\ \\mathrm{A/s}$. What is $v_L$?`,
-        u(v, "V"),
-        [u(l / didt, "V"), u(didt, "V"), u(l + didt, "V")],
-        `$v_L = L\\,di/dt = ${l} \\times ${didt} = ${v}\\ \\mathrm{V}$.`
-      );
-    },
-    () => {
-      const c = pick([1, 2, 4]);
-      const v = pick([2, 3, 4, 5, 6]);
-      const w = 0.5 * c * v * v;
-      return makeMcq(
-        "w2-cenergy",
-        `A ${u(c, "F")} capacitor is charged to ${u(v, "V")}. Stored energy?`,
-        u(w, "J"),
-        [u(c * v, "J"), u(c * v * v, "J"), u(0.5 * c * v, "J")],
-        `$w = \\frac{1}{2}CV^2 = \\frac{1}{2}(${c})(${v * v}) = ${w}\\ \\mathrm{J}$.`
-      );
-    },
-    () => {
-      const l = pick([1, 2, 4]);
-      const i = pick([2, 3, 4, 5]);
-      const w = 0.5 * l * i * i;
-      return makeMcq(
-        "w2-lenergy",
-        `An inductor $L = ${l}\\ \\mathrm{H}$ carries ${u(i, "A")}. Stored energy?`,
-        u(w, "J"),
-        [u(l * i, "J"), u(l * i * i, "J"), u(0.5 * l * i, "J")],
-        `$w = \\frac{1}{2}LI^2 = \\frac{1}{2}(${l})(${i * i}) = ${w}\\ \\mathrm{J}$.`
-      );
-    },
     () =>
       shuffleConcept(
-        "w2-dc",
-        "In DC steady state, a capacitor behaves like which element?",
-        ["A short", "An open", `A $1\\ \\Omega$ resistor`, "An inductor"],
+        "w2-ideal",
+        "For an ideal op-amp with negative feedback, current into the $+$ input is",
+        [
+          "huge",
+          "equal to $i_-$ and both are $0$",
+          "equal to the load current",
+          "$v_+/R$",
+        ],
         1,
-        "After transients die, $dv/dt = 0$, so $i_C = 0$: an open circuit."
+        "Ideal input currents are zero. Negative feedback forces $v_+ = v_-$."
       ),
+    () => {
+      const vp = pick([1, 2, 3, 4, 5]);
+      return makeMcq(
+        "w2-virtual",
+        `Ideal op-amp in negative feedback. If $v_+ = ${vp}\\ \\mathrm{V}$, what is $v_-$?`,
+        u(vp, "V"),
+        [u(0, "V"), u(-vp, "V"), u(2 * vp, "V")],
+        `Virtual short: $v_- = v_+ = ${vp}\\ \\mathrm{V}$.`
+      );
+    },
+    () => {
+      const rin = pick([1, 2, 4]);
+      const rf = rin * pick([2, 3, 4, 5]);
+      const gain = -(rf / rin);
+      return makeMcq(
+        "w2-inv",
+        `Inverting amp: $R_{in} = ${rin}\\ \\mathrm{k}\\Omega$, $R_f = ${rf}\\ \\mathrm{k}\\Omega$. Closed-loop gain?`,
+        `$${gain}$`,
+        [`$${Math.abs(gain)}$`, `$${gain - 1}$`, `$${1 + rf / rin}$`],
+        `$A = -R_f/R_{in} = -${rf}/${rin} = ${gain}$.`
+      );
+    },
+    () => {
+      const rg = pick([1, 2]);
+      const rf = rg * pick([2, 3, 4, 5]);
+      const gain = 1 + rf / rg;
+      return makeMcq(
+        "w2-ninv",
+        `Non-inverting amp: $R_f = ${rf}\\ \\mathrm{k}\\Omega$, $R_g = ${rg}\\ \\mathrm{k}\\Omega$. Gain?`,
+        `$${gain}$`,
+        [`$${rf / rg}$`, `$${-gain}$`, `$1$`],
+        `$A = 1 + R_f/R_g = 1 + ${rf / rg} = ${gain}$.`
+      );
+    },
   ],
   3: [
     () => {
@@ -277,51 +268,66 @@ const WARMUPS = {
     },
   ],
   4: [
-    () =>
-      shuffleConcept(
-        "w4-ideal",
-        "For an ideal op-amp with negative feedback, current into the $+$ input is",
-        [
-          "huge",
-          "equal to $i_-$ and both are $0$",
-          "equal to the load current",
-          "$v_+/R$",
-        ],
-        1,
-        "Ideal input currents are zero. Negative feedback forces $v_+ = v_-$."
-      ),
     () => {
-      const vp = pick([1, 2, 3, 4, 5]);
+      const rk = pick([1, 2, 4, 5]);
+      const cu = pick([1, 2, 5]);
+      const ms = rk * cu;
       return makeMcq(
-        "w4-virtual",
-        `Ideal op-amp in negative feedback. If $v_+ = ${vp}\\ \\mathrm{V}$, what is $v_-$?`,
-        u(vp, "V"),
-        [u(0, "V"), u(-vp, "V"), u(2 * vp, "V")],
-        `Virtual short: $v_- = v_+ = ${vp}\\ \\mathrm{V}$.`
+        "w4-tau-rc",
+        `An RC circuit has $R = ${rk}\\ \\mathrm{k}\\Omega$ and $C = ${cu}\\ \\mathrm{\\mu F}$. What is $\\tau$?`,
+        u(ms, "ms"),
+        [u(rk / cu, "ms"), u(ms, "s"), u(ms, "\\mu s")],
+        `$\\tau = RC = ${rk * 1000} \\times ${cu}\\times 10^{-6} = ${ms}\\ \\mathrm{ms}$.`
       );
     },
     () => {
-      const rin = pick([1, 2, 4]);
-      const rf = rin * pick([2, 3, 4, 5]);
-      const gain = -(rf / rin);
+      const l = pick([2, 4, 5, 8]);
+      const r = pick([2, 4, 5, 10]);
+      const tau = l / r;
       return makeMcq(
-        "w4-inv",
-        `Inverting amp: $R_{in} = ${rin}\\ \\mathrm{k}\\Omega$, $R_f = ${rf}\\ \\mathrm{k}\\Omega$. Closed-loop gain?`,
-        `$${gain}$`,
-        [`$${Math.abs(gain)}$`, `$${gain - 1}$`, `$${1 + rf / rin}$`],
-        `$A = -R_f/R_{in} = -${rf}/${rin} = ${gain}$.`
+        "w4-tau-rl",
+        `An RL circuit has $L = ${l}\\ \\mathrm{H}$ and $R = ${r}\\ \\Omega$. What is $\\tau$?`,
+        u(tau, "s"),
+        [u(l * r, "s"), u(r / l, "s"), u(l, "s")],
+        `$\\tau = L/R = ${l}/${r} = ${tau}\\ \\mathrm{s}$.`
       );
     },
     () => {
-      const rg = pick([1, 2]);
-      const rf = rg * pick([2, 3, 4, 5]);
-      const gain = 1 + rf / rg;
+      const v0 = pick([5, 8, 10, 12, 20]);
+      const vt = Math.round(v0 * 0.368 * 10) / 10;
       return makeMcq(
-        "w4-ninv",
-        `Non-inverting amp: $R_f = ${rf}\\ \\mathrm{k}\\Omega$, $R_g = ${rg}\\ \\mathrm{k}\\Omega$. Gain?`,
-        `$${gain}$`,
-        [`$${rf / rg}$`, `$${-gain}$`, `$1$`],
-        `$A = 1 + R_f/R_g = 1 + ${rf / rg} = ${gain}$.`
+        "w4-exp",
+        `A voltage starts at ${u(v0, "V")} and decays toward $0$ with time constant $\\tau$. What is $v(\\tau)$?`,
+        `about ${u(vt, "V")}`,
+        [u(v0, "V"), u(v0 / 2, "V"), u(0, "V")],
+        `$e^{-1} \\approx 0.368$, so $v(\\tau) \\approx ${(v0 * 0.368).toFixed(2)}\\ \\mathrm{V}$.`
+      );
+    },
+    () => {
+      const [w, c, mag] = pick([
+        [100, 0.01, 1],
+        [50, 0.02, 1],
+        [100, 0.02, 0.5],
+        [20, 0.05, 1],
+      ]);
+      return makeMcq(
+        "w4-zc",
+        `At $\\omega = ${w}\\ \\mathrm{rad/s}$, $C = ${c}\\ \\mathrm{F}$. What is $Z_C$?`,
+        `$-j${mag}\\ \\Omega$`,
+        [`$j${mag}\\ \\Omega$`, u(mag, "\\Omega"), `$j${w * c}\\ \\Omega$`],
+        `$Z_C = 1/(j\\omega C) = -j/(\\omega C) = -j${mag}\\ \\Omega$.`
+      );
+    },
+    () => {
+      const w = pick([20, 50, 100, 200]);
+      const l = pick([0.02, 0.05, 0.1, 0.2]);
+      const xl = Math.round(w * l * 100) / 100;
+      return makeMcq(
+        "w4-zl",
+        `At $\\omega = ${w}\\ \\mathrm{rad/s}$, $L = ${l}\\ \\mathrm{H}$. What is $Z_L$?`,
+        `$j${xl}\\ \\Omega$`,
+        [`$${xl}\\ \\Omega$`, `$j${l}\\ \\Omega$`, `$j${w}\\ \\Omega$`],
+        `$Z_L = j\\omega L = j(${w})(${l}) = j${xl}\\ \\Omega$.`
       );
     },
   ],
@@ -484,19 +490,18 @@ const PRIMERS = {
     ],
   },
   2: {
-    title: "Energy storage",
+    title: "Op-amps",
     intro:
-      "Capacitors store voltage, inductors store current. At DC steady state, treat C as open and L as a short.",
+      "Ideal op-amp in linear negative feedback: no input current, and the two input pins sit at the same voltage.",
     formulas: [
-      { name: "Capacitor current", expr: "$i_C = C\\,dv/dt$" },
-      { name: "Inductor voltage", expr: "$v_L = L\\,di/dt$" },
-      { name: "Capacitor energy", expr: "$w_C = \\frac{1}{2}CV^2$" },
-      { name: "Inductor energy", expr: "$w_L = \\frac{1}{2}LI^2$" },
-      { name: "DC steady state", expr: "C → open circuit, L → short circuit" },
+      { name: "Ideal inputs", expr: "$i_+ = i_- = 0$" },
+      { name: "Virtual short", expr: "$v_+ = v_-$ (with negative feedback)" },
+      { name: "Inverting gain", expr: "$v_o/v_i = -R_f/R_{in}$" },
+      { name: "Non-inverting gain", expr: "$v_o/v_i = 1 + R_f/R_g$" },
     ],
   },
   3: {
-    title: "Transients and AC",
+    title: "Transients",
     intro:
       "First find the time constant. For sinusoids, switch to phasors and impedances.",
     formulas: [
@@ -508,18 +513,19 @@ const PRIMERS = {
     ],
   },
   4: {
-    title: "Op-amps",
+    title: "First-order circuits",
     intro:
-      "Ideal op-amp in linear negative feedback: no input current, and the two input pins sit at the same voltage.",
+      "First find the time constant. For sinusoids, switch to phasors and impedances.",
     formulas: [
-      { name: "Ideal inputs", expr: "$i_+ = i_- = 0$" },
-      { name: "Virtual short", expr: "$v_+ = v_-$ (with negative feedback)" },
-      { name: "Inverting gain", expr: "$v_o/v_i = -R_f/R_{in}$" },
-      { name: "Non-inverting gain", expr: "$v_o/v_i = 1 + R_f/R_g$" },
+      { name: "RC time constant", expr: "$\\tau = RC$" },
+      { name: "RL time constant", expr: "$\\tau = L/R$" },
+      { name: "First-order form", expr: "$x(t) = x_\\infty + (x_0 - x_\\infty)e^{-t/\\tau}$" },
+      { name: "Capacitor impedance", expr: "$Z_C = 1/(j\\omega C)$" },
+      { name: "Inductor impedance", expr: "$Z_L = j\\omega L$" },
     ],
   },
   5: {
-    title: "Laplace",
+    title: "Laplace transforms",
     intro:
       "Replace each element with its s-domain model, then do circuit algebra in $s$. Zero initial conditions unless the problem states otherwise.",
     formulas: [

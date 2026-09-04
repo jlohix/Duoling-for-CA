@@ -82,6 +82,7 @@ export const STEPS = [
 export const PRACTICE = [
   {
     id: "p1",
+    view: "split",
     prompt: "Partial fractions exist so you can",
     options: {
       a: "Avoid the Laplace table.",
@@ -93,6 +94,7 @@ export const PRACTICE = [
   },
   {
     id: "p2",
+    view: "split",
     prompt: "If $F(s)$ is improper you first",
     options: {
       a: "Long-divide, then expand the remainder.",
@@ -104,6 +106,7 @@ export const PRACTICE = [
   },
   {
     id: "p3",
+    view: "table",
     prompt: "After $V(s)=3/(s+2)+4/(s+5)$, $v(t)$ is",
     options: {
       a: "$(3e^{-2t}+4e^{-5t})u(t)$.",
@@ -112,5 +115,29 @@ export const PRACTICE = [
     },
     answer: "a",
     why: "Two simple real poles. The $t e^{-pt}$ form is repeated.",
+  },
+  {
+    id: "p4",
+    view: "guide",
+    prompt: "After PFE you still multiply the time function by",
+    options: {
+      a: "$\\delta(t)$ only.",
+      b: "$u(t)$ (causal, $t\\ge 0$).",
+      c: "$e^{+st}$.",
+    },
+    answer: "b",
+    why: "Unilateral pairs are for $t\\ge 0$. Write $u(t)$ on the inverse.",
+  },
+  {
+    id: "p5",
+    view: "split",
+    prompt: "A simple real pole $k/(s+p)$ inverts to",
+    options: {
+      a: "$k e^{-pt}u(t)$.",
+      b: "$k t e^{-pt}u(t)$.",
+      c: "$k\\cos pt\\,u(t)$.",
+    },
+    answer: "a",
+    why: "The extra $t$ is a repeated pole. Cosine needs a quadratic factor.",
   },
 ];

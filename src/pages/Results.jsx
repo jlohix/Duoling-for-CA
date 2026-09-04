@@ -1,21 +1,28 @@
 import { useCallback, useState } from "react";
 import ThemeSwitch from "../components/ThemeSwitch";
 import StreakCelebrate from "../components/StreakCelebrate";
+import WalkRating from "../components/WalkRating";
 
-export default function Results({ summary, onHome }) {
+export default function Results({ summary, onHome, progress, setProgress }) {
   const skip = summary.kind === "skip";
   const failedSkip = skip && !summary.passed;
   const title = skip
     ? failedSkip
       ? "Not enough to skip"
       : "Topic unlocked"
-    : "Lesson complete";
+    : summary.kind === "walk"
+      ? "Walkthrough completed"
+      : summary.kind === "lab"
+        ? "Lab complete"
+        : "Lesson complete";
   const showStreak = Boolean(summary.streakGrew);
   const finalStreak = summary.streak ?? 0;
   const [streakShown, setStreakShown] = useState(
     showStreak ? summary.streakFrom ?? 0 : finalStreak
   );
   const onTick = useCallback((value) => setStreakShown(value), []);
+  const askRating = summary.kind === "walk" || summary.kind === "lab";
+  const lessonKey = summary.lessonKey || summary.topicName;
 
   return (
     <div className="page results">
@@ -55,6 +62,13 @@ export default function Results({ summary, onHome }) {
           <span>day streak</span>
         </li>
       </ul>
+      {askRating ? (
+        <WalkRating
+          lessonKey={lessonKey}
+          progress={progress}
+          setProgress={setProgress}
+        />
+      ) : null}
       <button type="button" className="primary" onClick={onHome}>
         Back to path
       </button>

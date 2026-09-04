@@ -25,7 +25,7 @@ import DividerSchematic from "./components/DividerSchematic";
 import PowerSchematic from "./components/PowerSchematic";
 import MaxPowerSchematic from "./components/MaxPowerSchematic";
 import { loadProgress } from "./state/progress";
-import { skipLeagueDays, syncLeagueSeason } from "./state/league";
+import { syncLeagueSeason } from "./state/league";
 import { loadSession, logout, isAdmin } from "./state/auth";
 import AppShell from "./components/AppShell";
 import Login from "./pages/Login";
@@ -44,6 +44,7 @@ import DragDcLab from "./pages/DragDcLab";
 import InvertingOpAmpLesson from "./pages/InvertingOpAmpLesson";
 import NonInvertingOpAmpLesson from "./pages/NonInvertingOpAmpLesson";
 import LaplaceLesson from "./section5/LaplaceLesson";
+import { SECTION_WALKS } from "./walks";
 import Results from "./pages/Results";
 
 export default function App() {
@@ -55,8 +56,9 @@ export default function App() {
   const [screen, setScreen] = useState("home");
   const [lesson, setLesson] = useState(null);
   const [paperPack, setPaperPack] = useState(null);
-  const [skipTarget, setSkipTarget] = useState(null);
   const [laplaceLabId, setLaplaceLabId] = useState(null);
+  const [secWalk, setSecWalk] = useState(null);
+  const [skipTarget, setSkipTarget] = useState(null);
   const [summary, setSummary] = useState(null);
   const [session, setSession] = useState(() => loadSession());
 
@@ -120,6 +122,7 @@ export default function App() {
       "invopamp",
       "ninvopamp",
       "laplacelab",
+      "secwalk",
       "paper",
     ].includes(screen);
 
@@ -149,13 +152,7 @@ export default function App() {
         ) : adminNav === "individualboard" ? (
           <Leaderboard user={session} progress={progress} mode="individual" />
         ) : adminNav === "leagues" ? (
-          <Leagues
-            user={session}
-            progress={progress}
-            onSkipDays={(days) =>
-              setProgress(skipLeagueDays(progress, days).progress)
-            }
-          />
+          <Leagues user={session} progress={progress} />
         ) : adminNav === "guide" ? (
           <Guide />
         ) : adminNav === "updates" ? (
@@ -272,14 +269,30 @@ export default function App() {
     );
   }
 
+  const preview = isAdmin(session);
+  const labXp = {
+    progress,
+    setProgress,
+    preview,
+    onExit: () => setScreen("home"),
+    onFinished: (result) => {
+      setSecWalk(null);
+      setLaplaceLabId(null);
+      setSummary(result);
+      setScreen("results");
+    },
+  };
+
   if (screen === "draglab") {
-    return <DragCircuitLab onExit={() => setScreen("home")} />;
+    return <DragCircuitLab {...labXp} walkKey="walk-lab-ohm" topicId={1} />;
   }
 
   if (screen === "dragthevlab") {
     return (
       <DragCircuitLab
-        onExit={() => setScreen("home")}
+        {...labXp}
+        walkKey="walk-lab-thevenin"
+        topicId={2}
         questions={THEVENIN_LAB_QUESTIONS}
         walkthrough={{
           title: "Thevenin",
@@ -293,7 +306,9 @@ export default function App() {
   if (screen === "dragnortonlab") {
     return (
       <DragCircuitLab
-        onExit={() => setScreen("home")}
+        {...labXp}
+        walkKey="walk-lab-norton"
+        topicId={2}
         questions={NORTON_LAB_QUESTIONS}
         walkthrough={{
           title: "Norton",
@@ -307,7 +322,9 @@ export default function App() {
   if (screen === "dragdeplab") {
     return (
       <DragCircuitLab
-        onExit={() => setScreen("home")}
+        {...labXp}
+        walkKey="walk-lab-dependent"
+        topicId={2}
         questions={DEPENDENT_LAB_QUESTIONS}
         walkthrough={{
           title: "Dependent sources",
@@ -321,7 +338,9 @@ export default function App() {
   if (screen === "dragnodallab") {
     return (
       <DragCircuitLab
-        onExit={() => setScreen("home")}
+        {...labXp}
+        walkKey="walk-lab-nodal"
+        topicId={1}
         questions={NODAL_LAB_QUESTIONS}
         walkthrough={{
           title: "Nodal",
@@ -335,7 +354,9 @@ export default function App() {
   if (screen === "dragmeshlab") {
     return (
       <DragCircuitLab
-        onExit={() => setScreen("home")}
+        {...labXp}
+        walkKey="walk-lab-mesh"
+        topicId={2}
         questions={MESH_LAB_QUESTIONS}
         walkthrough={{
           title: "Mesh",
@@ -349,7 +370,9 @@ export default function App() {
   if (screen === "dragsuperlab") {
     return (
       <DragCircuitLab
-        onExit={() => setScreen("home")}
+        {...labXp}
+        walkKey="walk-lab-supermesh"
+        topicId={2}
         questions={SUPERMESH_LAB_QUESTIONS}
         walkthrough={{
           title: "Supermesh",
@@ -363,7 +386,9 @@ export default function App() {
   if (screen === "dragsnlab") {
     return (
       <DragCircuitLab
-        onExit={() => setScreen("home")}
+        {...labXp}
+        walkKey="walk-lab-supernode"
+        topicId={2}
         questions={SUPERNODE_LAB_QUESTIONS}
         walkthrough={{
           title: "Supernode",
@@ -377,7 +402,9 @@ export default function App() {
   if (screen === "dragsuperposlab") {
     return (
       <DragCircuitLab
-        onExit={() => setScreen("home")}
+        {...labXp}
+        walkKey="walk-lab-superposition"
+        topicId={2}
         questions={SUPERPOS_LAB_QUESTIONS}
         walkthrough={{
           title: "Superposition",
@@ -391,7 +418,9 @@ export default function App() {
   if (screen === "dragdivlab") {
     return (
       <DragCircuitLab
-        onExit={() => setScreen("home")}
+        {...labXp}
+        walkKey="walk-lab-dividers"
+        topicId={1}
         questions={DIVIDER_LAB_QUESTIONS}
         walkthrough={{
           title: "Dividers",
@@ -405,7 +434,9 @@ export default function App() {
   if (screen === "dragpowerlab") {
     return (
       <DragCircuitLab
-        onExit={() => setScreen("home")}
+        {...labXp}
+        walkKey="walk-lab-power"
+        topicId={1}
         questions={POWER_LAB_QUESTIONS}
         walkthrough={{
           title: "Power",
@@ -419,7 +450,9 @@ export default function App() {
   if (screen === "dragmptlab") {
     return (
       <DragCircuitLab
-        onExit={() => setScreen("home")}
+        {...labXp}
+        walkKey="walk-lab-maxpower"
+        topicId={1}
         questions={MAX_POWER_LAB_QUESTIONS}
         walkthrough={{
           title: "Max power",
@@ -431,15 +464,47 @@ export default function App() {
   }
 
   if (screen === "dragdclab") {
-    return <DragDcLab onExit={() => setScreen("home")} />;
+    return <DragDcLab {...labXp} walkKey="walk-lab-dc" topicId={3} />;
   }
 
   if (screen === "invopamp") {
-    return <InvertingOpAmpLesson onExit={() => setScreen("home")} />;
+    return (
+      <InvertingOpAmpLesson {...labXp} walkKey="walk-lab-invopamp" topicId={2} />
+    );
   }
 
   if (screen === "ninvopamp") {
-    return <NonInvertingOpAmpLesson onExit={() => setScreen("home")} />;
+    return (
+      <NonInvertingOpAmpLesson
+        {...labXp}
+        walkKey="walk-lab-ninvopamp"
+        topicId={2}
+      />
+    );
+  }
+
+  if (screen === "secwalk" && secWalk) {
+    const pack = SECTION_WALKS[secWalk.section];
+    const LessonView = pack?.Lesson;
+    if (LessonView) {
+      return (
+        <LessonView
+          key={`${secWalk.section}-${secWalk.id}`}
+          labId={secWalk.id}
+          progress={progress}
+          setProgress={setProgress}
+          preview={preview}
+          onExit={() => {
+            setSecWalk(null);
+            setScreen("home");
+          }}
+          onContinue={(id) => {
+            setSecWalk({ section: secWalk.section, id });
+          }}
+          onFinished={labXp.onFinished}
+        />
+      );
+    }
   }
 
   if (screen === "laplacelab" && laplaceLabId) {
@@ -447,11 +512,14 @@ export default function App() {
       <LaplaceLesson
         key={laplaceLabId}
         labId={laplaceLabId}
+        progress={progress}
+        setProgress={setProgress}
+        preview={preview}
         onExit={() => {
           setLaplaceLabId(null);
           setScreen("home");
         }}
-        onContinue={(id) => setLaplaceLabId(id)}
+        onFinished={labXp.onFinished}
       />
     );
   }
@@ -512,7 +580,7 @@ export default function App() {
   }
 
   if (screen === "results" && summary) {
-    return <Results summary={summary} onHome={() => setScreen("home")} />;
+    return <Results summary={summary} progress={progress} setProgress={setProgress} onHome={() => setScreen("home")} />;
   }
 
   let main = (
@@ -548,6 +616,10 @@ export default function App() {
       onDcLab={() => setScreen("dragdclab")}
       onInvOpAmp={() => setScreen("invopamp")}
       onNonInvOpAmp={() => setScreen("ninvopamp")}
+      onSectionWalk={(section, id) => {
+        setSecWalk({ section, id });
+        setScreen("secwalk");
+      }}
       onLaplaceLab={(id) => {
         setLaplaceLabId(id);
         setScreen("laplacelab");

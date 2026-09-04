@@ -71,6 +71,7 @@ export const STEPS = [
 export const PRACTICE = [
   {
     id: "p1",
+    view: "plane",
     prompt: "Distinct complex poles (real coefficients) sit at",
     options: {
       a: "$s=-\\alpha\\pm j\\beta$ (a conjugate pair).",
@@ -82,6 +83,7 @@ export const PRACTICE = [
   },
   {
     id: "p2",
+    view: "trigtable",
     prompt: "The inverse of $\\beta / ((s+\\alpha)^2+\\beta^2)$ is",
     options: {
       a: "$e^{-\\alpha t}\\sin\\beta t\\,u(t)$.",
@@ -93,6 +95,7 @@ export const PRACTICE = [
   },
   {
     id: "p3",
+    view: "elements",
     prompt: "In series/parallel RLC, $\\beta$ in the inverse formula is",
     options: {
       a: "The damped frequency $\\omega_d$.",
@@ -101,5 +104,29 @@ export const PRACTICE = [
     },
     answer: "a",
     why: "$\\omega_d=\\sqrt{\\omega_0^2-\\alpha^2}$. Same number, two names.",
+  },
+  {
+    id: "p4",
+    view: "trigtable",
+    prompt: "The inverse of $(s+\\alpha)/((s+\\alpha)^2+\\beta^2)$ is",
+    options: {
+      a: "$e^{-\\alpha t}\\sin\\beta t\\,u(t)$.",
+      b: "$e^{-\\alpha t}\\cos\\beta t\\,u(t)$.",
+      c: "$t e^{-\\alpha t}u(t)$.",
+    },
+    answer: "b",
+    why: "Cosine has $(s+\\alpha)$ on top. Sine has $\\beta$ on top.",
+  },
+  {
+    id: "p5",
+    view: "damped",
+    prompt: "Underdamped RLC means $\\alpha$ compared with $\\omega_0$ is",
+    options: {
+      a: "$\\alpha>\\omega_0$.",
+      b: "$\\alpha=\\omega_0$.",
+      c: "$\\alpha<\\omega_0$.",
+    },
+    answer: "c",
+    why: "Then poles are $-\\alpha\\pm j\\omega_d$. Equal is critical. Larger $\\alpha$ is overdamped.",
   },
 ];

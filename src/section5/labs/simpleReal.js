@@ -69,6 +69,7 @@ export const STEPS = [
 export const PRACTICE = [
   {
     id: "p1",
+    view: "decay",
     prompt: "The inverse of $5/(s+4)$ is",
     options: {
       a: "$5e^{-4t}u(t)$.",
@@ -80,6 +81,7 @@ export const PRACTICE = [
   },
   {
     id: "p2",
+    view: "split",
     prompt: "Cover-up for $k_i$ at $s=-p_i$ means",
     options: {
       a: "Drop $(s+p_i)$ and evaluate the rest at $s=-p_i$.",
@@ -91,6 +93,7 @@ export const PRACTICE = [
   },
   {
     id: "p3",
+    view: "elements",
     prompt: "Two distinct real LHP poles are the",
     options: {
       a: "Overdamped natural response.",
@@ -99,5 +102,29 @@ export const PRACTICE = [
     },
     answer: "a",
     why: "Real and distinct roots $\\rightarrow$ overdamped.",
+  },
+  {
+    id: "p4",
+    view: "decay",
+    prompt: "The inverse of $3/(s+2)$ is",
+    options: {
+      a: "$2e^{-3t}u(t)$.",
+      b: "$3e^{-2t}u(t)$.",
+      c: "$3e^{+2t}u(t)$.",
+    },
+    answer: "b",
+    why: "$k/(s+p)\\leftrightarrow k e^{-pt}u(t)$. The $+$ exponential would grow.",
+  },
+  {
+    id: "p5",
+    view: "split",
+    prompt: "$F(s)=1/((s+1)(s+3))$ expands to terms like",
+    options: {
+      a: "$k_1/(s+1)+k_2/(s+3)$.",
+      b: "$(As+B)/((s+1)(s+3))$ and stop.",
+      c: "$k/(s+1)^2$ only.",
+    },
+    answer: "a",
+    why: "Two distinct real poles: two cover-up constants. Repeated would bring $t e^{-pt}$.",
   },
 ];

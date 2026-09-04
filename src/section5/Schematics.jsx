@@ -1,166 +1,15 @@
-function hot(highlight, id) {
-  if (highlight === "all") return "hot";
-  return highlight === id ? "hot" : "";
-}
-
-function Frame({ label, children }) {
-  return (
-    <svg
-      className="circuit-svg lab-teach"
-      viewBox="0 0 560 300"
-      role="img"
-      aria-label={label}
-    >
-      {children}
-    </svg>
-  );
-}
-
-function wrapLabel(text, width, size) {
-  const maxChars = Math.max(8, Math.floor(width / (size * 0.62)));
-  if (!text || text.length <= maxChars) return [text];
-  const gap = text.lastIndexOf(" ", maxChars);
-  const cut = gap >= 4 ? gap : maxChars;
-  const first = text.slice(0, cut).trim();
-  const rest = text.slice(cut).trim();
-  if (!rest) return [first];
-  return [first, rest];
-}
-
-function Box({ x, y, w, h, cls, title, sub, titleSize = 20, subSize = 12 }) {
-  const titles = wrapLabel(title, w - 16, titleSize);
-  const subs = sub ? wrapLabel(sub, w - 16, subSize) : [];
-  const block = titles.length * (titleSize + 2) + (subs.length ? 8 + subs.length * (subSize + 2) : 0);
-  let cursor = y + Math.max(28, (h - block) / 2 + titleSize);
-  return (
-    <g className={cls}>
-      <rect
-        x={x}
-        y={y}
-        width={w}
-        height={h}
-        rx="14"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="3"
-      />
-      {titles.map((line) => {
-        const node = (
-          <text
-            key={`t-${line}`}
-            x={x + w / 2}
-            y={cursor}
-            textAnchor="middle"
-            className={`circuit-label ${cls}`}
-            fontSize={titleSize}
-            fontWeight="800"
-          >
-            {line}
-          </text>
-        );
-        cursor += titleSize + 2;
-        return node;
-      })}
-      {subs.map((line) => {
-        cursor += 4;
-        const node = (
-          <text
-            key={`s-${line}`}
-            x={x + w / 2}
-            y={cursor}
-            textAnchor="middle"
-            className={`circuit-label ${cls}`}
-            fontSize={subSize}
-            fontWeight="700"
-          >
-            {line}
-          </text>
-        );
-        cursor += subSize + 2;
-        return node;
-      })}
-    </g>
-  );
-}
-
-function Arrow({ x1, y, x2, cls }) {
-  return (
-    <g className={cls} fill="none" stroke="currentColor" strokeWidth="3">
-      <path d={`M${x1} ${y} H${x2}`} />
-      <path d={`M${x2 - 12} ${y - 8} L${x2} ${y} L${x2 - 12} ${y + 8}`} />
-    </g>
-  );
-}
-
-function Resistor({ x, y, cls }) {
-  return (
-    <g
-      className={cls}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinejoin="round"
-      strokeLinecap="round"
-    >
-      <path
-        d={`M${x} ${y} H${x + 12} l7 -14 l14 28 l14 -28 l14 28 l14 -28 l7 14 H${x + 112}`}
-      />
-    </g>
-  );
-}
-
-function Inductor({ x, y, cls }) {
-  const start = x + 16;
-  const bumps = [0, 1, 2, 3]
-    .map((i) => {
-      const x0 = start + i * 22;
-      return `A11 11 0 0 0 ${x0 + 22} ${y}`;
-    })
-    .join(" ");
-  const d = `M${x} ${y} H${start} ${bumps} H${start + 88 + 16}`;
-  return (
-    <path
-      className={cls}
-      d={d}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  );
-}
-
-function Capacitor({ x, y, cls }) {
-  return (
-    <g className={cls} fill="none" stroke="currentColor" strokeWidth="3">
-      <path d={`M${x} ${y} H${x + 28}`} />
-      <path d={`M${x + 30} ${y - 22} V${y + 22}`} />
-      <path d={`M${x + 44} ${y - 22} V${y + 22}`} />
-      <path d={`M${x + 46} ${y} H${x + 74}`} />
-    </g>
-  );
-}
-
-function Battery({ x, y, cls }) {
-  return (
-    <g className={cls} fill="none" stroke="currentColor" strokeWidth="3">
-      <path d={`M${x} ${y} H${x + 28}`} />
-      <path d={`M${x + 30} ${y - 22} V${y + 22}`} />
-      <path d={`M${x + 42} ${y - 12} V${y + 12}`} />
-      <path d={`M${x + 44} ${y} H${x + 72}`} />
-    </g>
-  );
-}
-
-function samplePath(pointAt, n = 56) {
-  const pts = [];
-  for (let i = 0; i <= n; i += 1) {
-    const { x, y } = pointAt(i / n);
-    pts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
-  }
-  return pts.join(" ");
-}
+import {
+  Arrow,
+  Battery,
+  Box,
+  Capacitor,
+  Frame,
+  Inductor,
+  Resistor,
+  hot,
+  samplePath,
+  MathLabel,
+} from "../components/LabDraw";
 
 function MapView({ highlight }) {
   return (
@@ -171,7 +20,7 @@ function MapView({ highlight }) {
         w={200}
         h={110}
         cls={hot(highlight, "time")}
-        title="f(t)"
+        title="$f(t)$"
         sub="Time Domain"
       />
       <Arrow x1={236} y={133} x2={292} cls={hot(highlight, "map")} />
@@ -191,7 +40,7 @@ function MapView({ highlight }) {
         w={232}
         h={110}
         cls={hot(highlight, "s")}
-        title="F(s)"
+        title="$F(s)$"
         sub="Frequency Domain"
       />
     </Frame>
@@ -205,7 +54,7 @@ function GuideView({ highlight }) {
       <Arrow x1={176} y={133} x2={208} cls={hot(highlight, "map")} />
       <Box x={216} y={78} w={152} h={110} cls={hot(highlight, "s")} title="algebra" sub="in s" titleSize={18} />
       <Arrow x1={376} y={133} x2={408} cls={hot(highlight, "inv")} />
-      <Box x={416} y={78} w={128} h={110} cls={hot(highlight, "inv")} title="f(t)" sub="inverse" titleSize={18} />
+      <Box x={416} y={78} w={128} h={110} cls={hot(highlight, "inv")} title="$f(t)$" sub="inverse" titleSize={18} />
     </Frame>
   );
 }
@@ -219,7 +68,7 @@ function DerivView({ highlight }) {
         w={176}
         h={110}
         cls={hot(highlight, "dt")}
-        title="df/dt"
+        title="$\\dfrac{df}{dt}$"
         sub="Time Domain"
       />
       <Arrow x1={206} y={133} x2={256} cls={hot(highlight, "map")} />
@@ -229,7 +78,7 @@ function DerivView({ highlight }) {
         w={272}
         h={110}
         cls={hot(highlight, "s")}
-        title="sF − f(0⁻)"
+        title="$sF-f(0^-)$"
         sub="algebra in s"
         titleSize={20}
       />
@@ -246,7 +95,7 @@ function IntegView({ highlight }) {
         w={196}
         h={110}
         cls={hot(highlight, "dt")}
-        title="∫ f dτ"
+        title="$\\int f\\,d\\tau$"
         sub="0 to t"
       />
       <Arrow x1={226} y={133} x2={278} cls={hot(highlight, "map")} />
@@ -256,7 +105,7 @@ function IntegView({ highlight }) {
         w={250}
         h={110}
         cls={hot(highlight, "s")}
-        title="F(s)/s"
+        title="$F(s)/s$"
         sub="Time Integration"
       />
     </Frame>
@@ -272,7 +121,7 @@ function DelayView({ highlight }) {
         w={230}
         h={110}
         cls={hot(highlight, "time")}
-        title="f(t−a) u(t−a)"
+        title="$f(t-a)u(t-a)$"
         sub="Time Shift"
         titleSize={18}
       />
@@ -283,7 +132,7 @@ function DelayView({ highlight }) {
         w={220}
         h={110}
         cls={hot(highlight, "s")}
-        title="e^{−as} F(s)"
+        title="$e^{-as}F(s)$"
         sub="wait, then start"
         titleSize={18}
       />
@@ -294,7 +143,7 @@ function DelayView({ highlight }) {
 function ScaleView({ highlight }) {
   return (
     <Frame label="Time scaling">
-      <Box x={28} y={78} w={200} h={110} cls={hot(highlight, "time")} title="f(at)" sub="squeeze time" />
+      <Box x={28} y={78} w={200} h={110} cls={hot(highlight, "time")} title="$f(at)$" sub="squeeze time" />
       <Arrow x1={238} y={133} x2={292} cls={hot(highlight, "map")} />
       <Box
         x={300}
@@ -302,8 +151,8 @@ function ScaleView({ highlight }) {
         w={236}
         h={110}
         cls={hot(highlight, "s")}
-        title="(1/a) F(s/a)"
-        sub="a > 0"
+        title="$\\dfrac{1}{a}F(s/a)$"
+        sub="$a>0$"
         titleSize={18}
       />
     </Frame>
@@ -313,9 +162,9 @@ function ScaleView({ highlight }) {
 function FreqDiffView({ highlight }) {
   return (
     <Frame label="Multiply by t is minus dF/ds">
-      <Box x={28} y={78} w={196} h={110} cls={hot(highlight, "time")} title="t f(t)" sub="Time Domain" />
+      <Box x={28} y={78} w={196} h={110} cls={hot(highlight, "time")} title="$t f(t)$" sub="Time Domain" />
       <Arrow x1={234} y={133} x2={286} cls={hot(highlight, "map")} />
-      <Box x={294} y={78} w={236} h={110} cls={hot(highlight, "s")} title="−dF/ds" sub="Frequency Domain" titleSize={22} />
+      <Box x={294} y={78} w={236} h={110} cls={hot(highlight, "s")} title="$-\\dfrac{dF}{ds}$" sub="Frequency Domain" titleSize={22} />
     </Frame>
   );
 }
@@ -323,8 +172,8 @@ function FreqDiffView({ highlight }) {
 function InitFinalView({ highlight }) {
   return (
     <Frame label="Initial and final value theorems">
-      <Box x={24} y={78} w={246} h={110} cls={hot(highlight, "init")} title="f(0)" sub="lim s→∞  sF(s)" titleSize={22} />
-      <Box x={290} y={78} w={246} h={110} cls={hot(highlight, "fin")} title="f(∞)" sub="lim s→0  sF(s)" titleSize={22} />
+      <Box x={24} y={78} w={246} h={110} cls={hot(highlight, "init")} title="$f(0)$" sub="$\\lim_{s\\to\\infty} sF(s)$" titleSize={22} />
+      <Box x={290} y={78} w={246} h={110} cls={hot(highlight, "fin")} title="$f(\\infty)$" sub="$\\lim_{s\\to 0} sF(s)$" titleSize={22} />
     </Frame>
   );
 }
@@ -335,15 +184,9 @@ function ElementsView({ highlight }) {
       <Resistor x={28} y={118} cls={hot(highlight, "r")} />
       <Inductor x={198} y={118} cls={hot(highlight, "l")} />
       <Capacitor x={390} y={118} cls={hot(highlight, "c")} />
-      <text x="84" y="178" textAnchor="middle" className={`circuit-label ${hot(highlight, "r")}`} fontSize="16" fontWeight="800">
-        V = R I
-      </text>
-      <text x="254" y="178" textAnchor="middle" className={`circuit-label ${hot(highlight, "l")}`} fontSize="16" fontWeight="800">
-        V = sL I
-      </text>
-      <text x="428" y="178" textAnchor="middle" className={`circuit-label ${hot(highlight, "c")}`} fontSize="16" fontWeight="800">
-        V = I / sC
-      </text>
+      <MathLabel x={24} y={168} w={120} h={40} tex="$V=RI$" cls={hot(highlight, "r")} />
+      <MathLabel x={194} y={168} w={140} h={40} tex="$V=sL\\,I$" cls={hot(highlight, "l")} />
+      <MathLabel x={368} y={168} w={150} h={40} tex="$V=I/(sC)$" cls={hot(highlight, "c")} />
       <text x="280" y="248" textAnchor="middle" className="circuit-label" fontSize="14" fontWeight="700">
         Zero initial conditions
       </text>
@@ -354,7 +197,7 @@ function ElementsView({ highlight }) {
 function LinearView({ highlight }) {
   return (
     <Frame label="Linearity: scale and add">
-      <Box x={16} y={86} w={150} h={96} cls={hot(highlight, "f")} title="a1 F1" titleSize={18} />
+      <Box x={16} y={86} w={150} h={96} cls={hot(highlight, "f")} title="$a_1 F_1$" titleSize={18} />
       <text
         x={178}
         y={144}
@@ -364,7 +207,7 @@ function LinearView({ highlight }) {
       >
         +
       </text>
-      <Box x={204} y={86} w={150} h={96} cls={hot(highlight, "g")} title="a2 F2" titleSize={18} />
+      <Box x={204} y={86} w={150} h={96} cls={hot(highlight, "g")} title="$a_2 F_2$" titleSize={18} />
       <text
         x={366}
         y={144}
@@ -388,7 +231,7 @@ function ShiftView({ highlight }) {
         w={220}
         h={110}
         cls={hot(highlight, "time")}
-        title="e^{−at} f(t)"
+        title="$e^{-at}f(t)$"
         sub="Frequency Shift"
         titleSize={18}
       />
@@ -399,7 +242,7 @@ function ShiftView({ highlight }) {
         w={220}
         h={110}
         cls={hot(highlight, "s")}
-        title="F(s+a)"
+        title="$F(s+a)$"
         sub="replace s by s+a"
       />
     </Frame>
@@ -413,29 +256,18 @@ function IcView({ highlight }) {
         Inductor
       </text>
       <Inductor x={80} y={70} cls={hot(highlight, "l")} />
-      <text x="150" y="108" textAnchor="middle" className={`circuit-label ${hot(highlight, "l")}`} fontSize="14" fontWeight="800">
-        sL
-      </text>
+      <MathLabel x={90} y={88} w={120} h={36} tex="$sL$" cls={hot(highlight, "l")} />
       <Battery x={80} y={148} cls={hot(highlight, "src")} />
-      <text x="150" y="198" textAnchor="middle" className={`circuit-label ${hot(highlight, "src")}`} fontSize="13" fontWeight="800">
-        series L i(0⁻)
-      </text>
+      <MathLabel x={70} y={178} w={160} h={36} tex="$Li(0^-)$" cls={hot(highlight, "src")} />
       <text x="410" y="32" textAnchor="middle" className={`circuit-label ${hot(highlight, "c")}`} fontSize="15" fontWeight="800">
         Capacitor
       </text>
       <Capacitor x={360} y={70} cls={hot(highlight, "c")} />
-      <text x="410" y="108" textAnchor="middle" className={`circuit-label ${hot(highlight, "c")}`} fontSize="14" fontWeight="800">
-        1/sC
-      </text>
+      <MathLabel x={350} y={88} w={120} h={36} tex="$1/(sC)$" cls={hot(highlight, "c")} />
       <Battery x={360} y={148} cls={hot(highlight, "src")} />
-      <text x="410" y="198" textAnchor="middle" className={`circuit-label ${hot(highlight, "src")}`} fontSize="13" fontWeight="800">
-        series v(0⁻)/s
-      </text>
+      <MathLabel x={330} y={178} w={160} h={36} tex="$v(0^-)/s$" cls={hot(highlight, "src")} />
       <text x="280" y="248" textAnchor="middle" className="circuit-label" fontSize="13" fontWeight="700">
-        Parallel forms
-      </text>
-      <text x="280" y="272" textAnchor="middle" className="circuit-label" fontSize="12" fontWeight="700">
-        i(0⁻)/s with L · C v(0⁻) with C
+        Parallel: L uses i(0⁻)/s · C uses C v(0⁻)
       </text>
     </Frame>
   );
@@ -443,14 +275,14 @@ function IcView({ highlight }) {
 
 function TableView({ highlight }) {
   const rows = [
-    { id: "imp", left: "δ(t)", right: "1" },
-    { id: "step", left: "u(t)", right: "1/s" },
-    { id: "exp", left: "e^{-at} u(t)", right: "1/(s+a)" },
+    { id: "imp", left: "$\\delta(t)$", right: "$1$" },
+    { id: "step", left: "$u(t)$", right: "$1/s$" },
+    { id: "exp", left: "$e^{-at}u(t)$", right: "$1/(s+a)$" },
   ];
   return (
     <Frame label="Common Laplace pairs">
       {rows.map((row, i) => (
-        <g key={row.id}>
+        <g key={row.id} className={hot(highlight, row.id)}>
           <rect
             x="50"
             y={48 + i * 70}
@@ -462,36 +294,9 @@ function TableView({ highlight }) {
             strokeWidth="3"
             className={hot(highlight, row.id)}
           />
-          <text
-            x="160"
-            y={86 + i * 70}
-            textAnchor="middle"
-            className={`circuit-label ${hot(highlight, row.id)}`}
-            fontSize="20"
-            fontWeight="800"
-          >
-            {row.left}
-          </text>
-          <text
-            x="280"
-            y={86 + i * 70}
-            textAnchor="middle"
-            className={`circuit-label ${hot(highlight, row.id)}`}
-            fontSize="20"
-            fontWeight="800"
-          >
-            ↔
-          </text>
-          <text
-            x="400"
-            y={86 + i * 70}
-            textAnchor="middle"
-            className={`circuit-label ${hot(highlight, row.id)}`}
-            fontSize="20"
-            fontWeight="800"
-          >
-            {row.right}
-          </text>
+          <MathLabel x={60} y={52 + i * 70} w={180} h={50} tex={row.left} cls={hot(highlight, row.id)} />
+          <MathLabel x={240} y={52 + i * 70} w={80} h={50} tex="$\\leftrightarrow$" cls={hot(highlight, row.id)} />
+          <MathLabel x={320} y={52 + i * 70} w={180} h={50} tex={row.right} cls={hot(highlight, row.id)} />
         </g>
       ))}
     </Frame>
@@ -513,12 +318,8 @@ function PlaneView({ highlight }) {
   return (
     <Frame label="Poles and zeros on the s-plane">
       <Axes />
-      <text x="512" y="148" className="circuit-label" fontSize="14" fontWeight="800">
-        σ
-      </text>
-      <text x="292" y="28" className="circuit-label" fontSize="14" fontWeight="800">
-        jω
-      </text>
+      <MathLabel x={500} y={124} w={50} h={36} tex="$\\sigma$" />
+      <MathLabel x={268} y={8} w={50} h={36} tex="$j\\omega$" />
       <circle
         cx="218"
         cy="140"
@@ -590,25 +391,11 @@ function DecayView({ highlight }) {
         strokeWidth="3"
         strokeLinejoin="round"
       />
-      <text
-        x="430"
-        y="56"
-        textAnchor="middle"
-        className={`circuit-label ${hot(highlight, "pole")}`}
-        fontSize="16"
-        fontWeight="800"
-      >
-        pole at −p
+      <text x={360} y={24} className={`circuit-label ${hot(highlight, "pole")}`} fontSize="14" fontWeight="800">
+        pole at
       </text>
-      <text
-        x="140"
-        y="262"
-        className={`circuit-label ${hot(highlight, "curve")}`}
-        fontSize="16"
-        fontWeight="800"
-      >
-        {"k e^{-pt}"}
-      </text>
+      <MathLabel x={430} y={4} w={90} h={40} tex="$-p$" cls={hot(highlight, "pole")} />
+      <MathLabel x={40} y={236} w={220} h={44} tex="$k e^{-pt}$" cls={hot(highlight, "curve")} />
     </Frame>
   );
 }
@@ -667,16 +454,7 @@ function DampedView({ highlight }) {
         strokeWidth="3"
         strokeLinejoin="round"
       />
-      <text
-        x="280"
-        y="36"
-        textAnchor="middle"
-        className={`circuit-label ${hot(highlight, "pole")}`}
-        fontSize="16"
-        fontWeight="800"
-      >
-        ×* at −α ± jβ
-      </text>
+      <MathLabel x={80} y={8} w={400} h={40} tex="$-\\alpha\\pm j\\beta$" cls={hot(highlight, "pole")} />
     </Frame>
   );
 }
@@ -684,10 +462,10 @@ function DampedView({ highlight }) {
 function SplitView({ highlight }) {
   return (
     <Frame label="Partial fractions split F(s) into table terms">
-      <Box x={24} y={90} w={140} h={90} cls={hot(highlight, "f")} title="F(s)" />
+      <Box x={24} y={90} w={140} h={90} cls={hot(highlight, "f")} title="$F(s)$" />
       <Arrow x1={174} y={135} x2={218} cls={hot(highlight, "split")} />
-      <Box x={228} y={24} w={308} h={68} cls={hot(highlight, "a")} title="k1 / (s+p1)" titleSize={18} />
-      <Box x={228} y={104} w={308} h={68} cls={hot(highlight, "b")} title="k2 / (s+p2)" titleSize={18} />
+      <Box x={228} y={24} w={308} h={68} cls={hot(highlight, "a")} title="$k_1/(s+p_1)$" titleSize={18} />
+      <Box x={228} y={104} w={308} h={68} cls={hot(highlight, "b")} title="$k_2/(s+p_2)$" titleSize={18} />
       <Box x={228} y={184} w={308} h={68} cls={hot(highlight, "c")} title="table terms" titleSize={18} />
     </Frame>
   );
@@ -695,14 +473,14 @@ function SplitView({ highlight }) {
 
 function TrigTableView({ highlight }) {
   const rows = [
-    { id: "sin", left: "sin ωt u(t)", right: ["ω / (s² + ω²)"] },
-    { id: "cos", left: "cos ωt u(t)", right: ["s / (s² + ω²)"] },
-    { id: "damp", left: "e^{-at} sin ωt", right: ["ω", "((s+a)² + ω²)"] },
+    { id: "sin", left: "$\\sin\\omega t\\,u(t)$", right: "$\\dfrac{\\omega}{s^2+\\omega^2}$" },
+    { id: "cos", left: "$\\cos\\omega t\\,u(t)$", right: "$\\dfrac{s}{s^2+\\omega^2}$" },
+    { id: "damp", left: "$e^{-at}\\sin\\omega t$", right: "$\\dfrac{\\omega}{(s+a)^2+\\omega^2}$" },
   ];
   return (
     <Frame label="Sine, cosine, and damped sine pairs">
       {rows.map((row, i) => (
-        <g key={row.id}>
+        <g key={row.id} className={hot(highlight, row.id)}>
           <rect
             x="20"
             y={36 + i * 84}
@@ -714,39 +492,9 @@ function TrigTableView({ highlight }) {
             strokeWidth="3"
             className={hot(highlight, row.id)}
           />
-          <text
-            x="148"
-            y={78 + i * 84}
-            textAnchor="middle"
-            className={`circuit-label ${hot(highlight, row.id)}`}
-            fontSize="16"
-            fontWeight="800"
-          >
-            {row.left}
-          </text>
-          <text
-            x="268"
-            y={78 + i * 84}
-            textAnchor="middle"
-            className={`circuit-label ${hot(highlight, row.id)}`}
-            fontSize="18"
-            fontWeight="800"
-          >
-            ↔
-          </text>
-          {row.right.map((line, lineIndex) => (
-            <text
-              key={line}
-              x="400"
-              y={64 + i * 84 + lineIndex * 22 + (row.right.length === 1 ? 14 : 0)}
-              textAnchor="middle"
-              className={`circuit-label ${hot(highlight, row.id)}`}
-              fontSize="15"
-              fontWeight="800"
-            >
-              {line}
-            </text>
-          ))}
+          <MathLabel x={28} y={40 + i * 84} w={210} h={66} tex={row.left} cls={hot(highlight, row.id)} />
+          <MathLabel x={238} y={40 + i * 84} w={60} h={66} tex="$\\leftrightarrow$" cls={hot(highlight, row.id)} />
+          <MathLabel x={298} y={40 + i * 84} w={230} h={66} tex={row.right} cls={hot(highlight, row.id)} />
         </g>
       ))}
     </Frame>

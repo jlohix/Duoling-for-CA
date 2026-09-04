@@ -64,7 +64,7 @@ export const DEPENDENT_STEPS = [
     view: "vcvs",
     highlight: "dep",
     title: "Your turn",
-    body: "The lab asks what a diamond is, whether you kill it for $R_{th}$, and the loop current from the VCVS sketch. Pick the answer. No XP.",
+    body: "The lab asks what a diamond is, whether you kill it for $R_{th}$, and the loop current from the VCVS sketch. Pick the answer.",
     eq: "Diamond stays. Independent goes",
   },
 ];

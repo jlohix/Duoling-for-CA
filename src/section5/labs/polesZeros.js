@@ -75,6 +75,7 @@ export const STEPS = [
 export const PRACTICE = [
   {
     id: "p1",
+    view: "split",
     prompt: "A pole is a value of $s$ where",
     options: {
       a: "$N(s)=0$.",
@@ -86,6 +87,7 @@ export const PRACTICE = [
   },
   {
     id: "p2",
+    view: "split",
     prompt: "If $\\deg N \\ge \\deg D$ you first",
     options: {
       a: "Long-divide, then expand $R(s)/D(s)$.",
@@ -97,6 +99,7 @@ export const PRACTICE = [
   },
   {
     id: "p3",
+    view: "guide",
     prompt: "$H(s)$ is defined with",
     options: {
       a: "Whatever I.C.s the circuit happens to have.",
@@ -105,5 +108,29 @@ export const PRACTICE = [
     },
     answer: "b",
     why: "Transfer function assumes no initial energy. $h(t)$ is the impulse response.",
+  },
+  {
+    id: "p4",
+    view: "split",
+    prompt: "A zero is a value of $s$ where",
+    options: {
+      a: "$N(s)=0$.",
+      b: "$D(s)=0$.",
+      c: "$F(s)=\\infty$.",
+    },
+    answer: "a",
+    why: "$N(s)=0$ are zeros. $D(s)=0$ are poles, where $|F|$ blows up.",
+  },
+  {
+    id: "p5",
+    view: "guide",
+    prompt: "The impulse response $h(t)$ is",
+    options: {
+      a: "The inverse LT of $H(s)$.",
+      b: "Always $\\delta(t)$.",
+      c: "The same as the step response.",
+    },
+    answer: "a",
+    why: "$h(t)=\\mathcal{L}^{-1}\\{H(s)\\}$. Step response is the integral of $h$, not $h$ itself.",
   },
 ];

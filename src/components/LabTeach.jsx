@@ -1,8 +1,7 @@
 import { useState } from "react";
 import MathText from "./MathText";
 import ThemeSwitch from "./ThemeSwitch";
-
-const LABELS = ["A", "B", "C"];
+import { InlineKnowledgeCheck } from "./QuickCheck";
 
 function asItems(value) {
   if (value == null || value === "") return [];
@@ -91,6 +90,8 @@ export default function LabTeach({
     resetCheck();
   }
 
+  const checkTotal = steps.filter((item) => item.check).length;
+  const checkNumber = steps.slice(0, index + 1).filter((item) => item.check).length;
   const lastLabel = chainLabel || practiceLabel;
 
   function back() {
@@ -116,12 +117,16 @@ export default function LabTeach({
           {skipLabel}
         </button>
       ) : null}
-      <div className="circuit-board">
-        <Schematic highlight={step.highlight} view={step.view} />
-        {step.boardHint || boardHint ? (
-          <p className="circuit-dot-key">{step.boardHint || boardHint}</p>
-        ) : null}
-      </div>
+      {step.view && step.view !== "map" && !step.hideBoard ? (
+        <div className="circuit-board">
+          <Schematic highlight={step.highlight} view={step.view} />
+          {(step.boardHint !== undefined ? step.boardHint : boardHint) ? (
+            <p className="circuit-dot-key">
+              {step.boardHint !== undefined ? step.boardHint : boardHint}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
       <section className="teach-card">
         <p className="eyebrow">
           Step {index + 1} of {steps.length}
@@ -131,59 +136,17 @@ export default function LabTeach({
         </h2>
         <TeachCopy step={step} />
         {step.check ? (
-          <div className="opamp-check">
-            <p>
-              <MathText text={step.check.prompt} />
-            </p>
-            <div className="options">
-              {LABELS.map((label) => {
-                const key = label.toLowerCase();
-                const text = step.check.options[key];
-                if (!text) return null;
-                const isSelected = selected === key;
-                const isCorrect = step.check.answer === key;
-                let extra = "";
-                if (revealed && isCorrect) extra = "correct";
-                if (revealed && isSelected && !isCorrect) extra = "wrong";
-                if (!revealed && isSelected) extra = "picked";
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    className={`option ${extra}`}
-                    disabled={revealed}
-                    onClick={() => setSelected(key)}
-                  >
-                    <span className="option-letter">{label}</span>
-                    <MathText text={text} />
-                  </button>
-                );
-              })}
-            </div>
-            {!revealed ? (
-              <button
-                type="button"
-                className="primary check"
-                disabled={!selected}
-                onClick={check}
-              >
-                Check
-              </button>
-            ) : ok ? (
-              <p className="ok-text">
-                <MathText text={step.check.why} />
-              </p>
-            ) : (
-              <div className="feedback-row">
-                <p className="bad-text">
-                  <MathText text={step.check.why} />
-                </p>
-                <button type="button" className="ghost" onClick={resetCheck}>
-                  Try again
-                </button>
-              </div>
-            )}
-          </div>
+          <InlineKnowledgeCheck
+            check={step.check}
+            lockKey={step.id}
+            selected={selected}
+            revealed={revealed}
+            ok={ok}
+            onSelect={setSelected}
+            onCheck={check}
+            onRetry={resetCheck}
+            progressLabel={checkTotal > 1 ? `${checkNumber} of ${checkTotal}` : undefined}
+          />
         ) : null}
         <div className="opamp-nav">
           <button

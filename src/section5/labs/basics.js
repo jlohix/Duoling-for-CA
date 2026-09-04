@@ -104,6 +104,7 @@ export const STEPS = [
 export const PRACTICE = [
   {
     id: "p1",
+    view: "map",
     prompt: "Laplace is useful because it turns",
     options: {
       a: "Algebra into harder calculus.",
@@ -115,6 +116,7 @@ export const PRACTICE = [
   },
   {
     id: "p2",
+    view: "table",
     prompt: "$\\mathcal{L}\\{\\delta(t)\\}$ is",
     options: {
       a: "$1/s$.",
@@ -126,6 +128,7 @@ export const PRACTICE = [
   },
   {
     id: "p3",
+    view: "elements",
     prompt: "With $v(0^-)=0$, a capacitor in the $s$-domain obeys",
     options: {
       a: "$V=sC\\,I$.",
@@ -134,5 +137,29 @@ export const PRACTICE = [
     },
     answer: "c",
     why: "Zero-I.C. capacitor: $V(s)=I(s)/(sC)$. $sC$ is the admittance.",
+  },
+  {
+    id: "p4",
+    view: "elements",
+    prompt: "With $i(0^-)=0$, an inductor in the $s$-domain obeys",
+    options: {
+      a: "$V=I/(sL)$.",
+      b: "$V=sL\\,I$.",
+      c: "$V=L I$ with no $s$.",
+    },
+    answer: "b",
+    why: "$v=L di/dt$ and zero I.C. give $V=sLI$. The capacitor is $V=I/(sC)$.",
+  },
+  {
+    id: "p5",
+    view: "map",
+    prompt: "The unilateral Laplace integral starts at $0^-$ so that",
+    options: {
+      a: "Signals for $t<0$ still count.",
+      b: "Jumps and I.C.s at $t=0$ are included.",
+      c: "$s$ becomes a real number only.",
+    },
+    answer: "b",
+    why: "Just before $t=0$ captures the impulse/step at the origin. $t<0$ is still ignored.",
   },
 ];

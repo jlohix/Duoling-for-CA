@@ -5,7 +5,7 @@ import {
 import { NonInvertingSchematic } from "../components/OpAmpSchematics";
 import OpAmpWalkthrough from "./OpAmpWalkthrough";
 
-export default function NonInvertingOpAmpLesson({ onExit }) {
+export default function NonInvertingOpAmpLesson({ onExit, ...rest }) {
   return (
     <OpAmpWalkthrough
       title="Non-inverting amp"
@@ -16,6 +16,7 @@ export default function NonInvertingOpAmpLesson({ onExit }) {
       practice={NON_INVERTING_PRACTICE}
       Schematic={NonInvertingSchematic}
       onExit={onExit}
+      {...rest}
     />
   );
 }

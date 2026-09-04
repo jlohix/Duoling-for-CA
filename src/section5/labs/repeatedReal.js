@@ -71,6 +71,7 @@ export const STEPS = [
 export const PRACTICE = [
   {
     id: "p1",
+    view: "bump",
     prompt: "The inverse of $1/(s+5)^2$ is",
     options: {
       a: "$e^{-5t}u(t)$.",
@@ -82,6 +83,7 @@ export const PRACTICE = [
   },
   {
     id: "p2",
+    view: "split",
     prompt: "For a double pole the expansion must include",
     options: {
       a: "Only $k_2/(s+p)^2$.",
@@ -93,6 +95,7 @@ export const PRACTICE = [
   },
   {
     id: "p3",
+    view: "bump",
     prompt: "Critically damped natural response looks like",
     options: {
       a: "$(D_1+D_2 t)e^{-\\alpha t}u(t)$.",
@@ -101,5 +104,29 @@ export const PRACTICE = [
     },
     answer: "a",
     why: "Equal roots. Overdamped is two $p$'s. Underdamped is $\\alpha\\pm j\\beta$.",
+  },
+  {
+    id: "p4",
+    view: "split",
+    prompt: "For $1/(s+p)^2$ the cover-up order is",
+    options: {
+      a: "Find $k_2$ first, then $k_1$.",
+      b: "Skip $k_1$; only $k_2$ exists.",
+      c: "Use a conjugate pair.",
+    },
+    answer: "a",
+    why: "$k_2$ is cover-up on the square. $k_1$ needs a derivative (or equate coeffs).",
+  },
+  {
+    id: "p5",
+    view: "elements",
+    prompt: "Repeated real LHP poles are the",
+    options: {
+      a: "Overdamped case.",
+      b: "Underdamped case.",
+      c: "Critically damped case.",
+    },
+    answer: "c",
+    why: "$\\alpha=\\omega_0$ repeats the root. Overdamped is two different $p$'s.",
   },
 ];

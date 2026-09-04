@@ -200,6 +200,7 @@ export function listStudents(liveProgress, options = {}) {
     streak: visibleStreak(liveProgress),
     topicStats: cloneStats(liveProgress.topicStats),
     completed: liveProgress.completed || [],
+    walkFeedback: liveProgress.walkFeedback || {},
     live: true,
   };
 
