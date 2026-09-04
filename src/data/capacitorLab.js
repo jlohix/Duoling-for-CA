@@ -18,6 +18,15 @@ export const CAPACITOR_DRAG = [
     why: "Parallel: $C_{eq}=C_1+C_2=3+6=9\\,\\mu\\mathrm{F}$.",
   },
   {
+    id: "series-6-3",
+    kind: "series",
+    c1: 6,
+    c2: 3,
+    correct: 2,
+    choices: [2, 3, 9, 18],
+    why: "Series: $1/C_{eq}=1/6+1/3=1/2$, so $C_{eq}=2\\,\\mu\\mathrm{F}$. $9$ is parallel.",
+  },
+  {
     id: "tpos-i",
     kind: "tpos",
     volts: 10,

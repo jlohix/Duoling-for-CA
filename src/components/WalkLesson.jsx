@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import MathText from "./MathText";
 import ThemeSwitch from "./ThemeSwitch";
 import LabTeach from "./LabTeach";
+import ValueDragLab from "./ValueDragLab";
 import { InlineKnowledgeCheck } from "./QuickCheck";
 
 function resolvePracticeView(question, lab, practiceView) {
@@ -14,7 +15,7 @@ function resolvePracticeView(question, lab, practiceView) {
   return step?.view || null;
 }
 
-function PracticeView({ title, progressLabel, practice, Schematic, boardHint, practiceView, lab, onExit, onDone }) {
+function PracticeView({ title, progressLabel, practice, Schematic, boardHint, practiceView, lab, lastLabel = "See score", onExit, onDone }) {
   const queue = useMemo(() => practice, [practice]);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState("");
@@ -84,7 +85,7 @@ function PracticeView({ title, progressLabel, practice, Schematic, boardHint, pr
           progressLabel={`${index + 1} of ${queue.length}`}
           afterReveal={
             <button type="button" className="primary qc-next" onClick={next}>
-              {last ? "See score" : "Next"}
+              {last ? lastLabel : "Next"}
             </button>
           }
         />
@@ -98,10 +99,25 @@ export default function WalkLesson({ labId, catalog, Schematic, onExit, onContin
   const next = catalog.getNext(labId);
   const part = Math.max(1, catalog.labs.findIndex((item) => item.id === lab.id) + 1);
   const progressLabel = `${catalog.label} ${part} of ${catalog.labs.length}`;
+  const hasPractice = Boolean(lab.practice?.length);
+  const hasDrag = Boolean(lab.drag?.length && lab.DragBoard);
   const [stage, setStage] = useState("teach");
   const [score, setScore] = useState(null);
 
+  function afterPractice(ok, total) {
+    setScore({ ok, total });
+    setStage(hasDrag ? "drag" : "done");
+  }
+
   if (stage === "done" && score) {
+    const checks =
+      score.total != null
+        ? `You got ${score.ok}/${score.total} on the quick checks`
+        : "";
+    const drags =
+      score.dragTotal != null
+        ? `${checks ? " and " : "You got "}${score.dragOk}/${score.dragTotal} on the drag board`
+        : "";
     return (
       <div className="page results">
         <header className="topbar">
@@ -113,8 +129,10 @@ export default function WalkLesson({ labId, catalog, Schematic, onExit, onContin
           <MathText text={lab.formula} />
         </p>
         <p>
-          You got {score.ok}/{score.total} on the quick checks. {lab.doneBlurb} No
-          XP for this try-it lesson.
+          {checks}
+          {drags}
+          {checks || drags ? ". " : ""}
+          {lab.doneBlurb} No XP for this try-it lesson.
         </p>
         <div className="opamp-nav">
           {next ? (
@@ -140,7 +158,30 @@ export default function WalkLesson({ labId, catalog, Schematic, onExit, onContin
     );
   }
 
-  if (stage === "practice") {
+  if (stage === "drag" && hasDrag) {
+    return (
+      <ValueDragLab
+        title={lab.title}
+        progressLabel={progressLabel}
+        questions={lab.drag}
+        Board={lab.DragBoard}
+        promptFor={lab.dragPrompt}
+        labelFor={lab.dragLabel}
+        hint={lab.dragHint}
+        onExit={onExit}
+        onDone={(ok, total) => {
+          setScore((prev) => ({
+            ...(prev || {}),
+            dragOk: ok,
+            dragTotal: total,
+          }));
+          setStage("done");
+        }}
+      />
+    );
+  }
+
+  if (stage === "practice" && hasPractice) {
     return (
       <PracticeView
         title={lab.title}
@@ -150,11 +191,9 @@ export default function WalkLesson({ labId, catalog, Schematic, onExit, onContin
         boardHint={lab.boardHint}
         practiceView={lab.practiceView}
         lab={lab}
+        lastLabel={hasDrag ? "Drag values" : "See score"}
         onExit={onExit}
-        onDone={(ok, total) => {
-          setScore({ ok, total });
-          setStage("done");
-        }}
+        onDone={afterPractice}
       />
     );
   }
@@ -166,12 +205,16 @@ export default function WalkLesson({ labId, catalog, Schematic, onExit, onContin
       steps={lab.steps}
       Schematic={Schematic}
       boardHint={lab.boardHint}
-      practiceLabel="Try a few"
-      skipLabel={next ? "Try a few on this topic" : "Skip walkthrough"}
-      chainLabel={next ? `Next: ${next.title}` : null}
+      practiceLabel={hasPractice ? "Try a few" : hasDrag ? "Drag values" : "Finish"}
+      skipLabel={
+        hasPractice
+          ? "Try a few on this topic"
+          : hasDrag
+            ? "Skip to drag lab"
+            : "Skip walkthrough"
+      }
       onExit={onExit}
-      onPractice={() => setStage("practice")}
-      onChain={next ? () => onContinue(next.id) : undefined}
+      onPractice={() => setStage(hasPractice ? "practice" : hasDrag ? "drag" : "done")}
     />
   );
 }

@@ -1,5 +1,17 @@
 export const BUILT_IN_LOGS = [
   {
+    id: "built-2026-09-04-empty-bank-loads",
+    date: "2026-09-04",
+    title: "Learn opens without quizzes",
+    body: "Learn no longer sits on “Loading question bank” while Easy, Average, and Challenging are empty. Walkthroughs and past year papers still work.",
+  },
+  {
+    id: "built-2026-09-04-s3-drag-labs",
+    date: "2026-09-04",
+    title: "Drag labs on Transients",
+    body: "After Capacitor, Inductor, Source-Free Capacitor, and Inductor with a Source, you now drop values onto the schematic: Ceq, Leq, τ, and the settled current.",
+  },
+  {
     id: "built-2026-09-04-opamps-section2",
     date: "2026-09-04",
     title: "Op-amps moved up",

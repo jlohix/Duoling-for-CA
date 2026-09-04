@@ -49,6 +49,7 @@ import Results from "./pages/Results";
 
 export default function App() {
   const [questions, setQuestions] = useState([]);
+  const [questionsLoaded, setQuestionsLoaded] = useState(false);
   const [error, setError] = useState("");
   const [progress, setProgress] = useState(
     () => syncLeagueSeason(loadProgress()).progress
@@ -64,8 +65,14 @@ export default function App() {
 
   useEffect(() => {
     loadQuestions()
-      .then(setQuestions)
-      .catch((err) => setError(err.message));
+      .then((rows) => {
+        setQuestions(rows);
+        setQuestionsLoaded(true);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setQuestionsLoaded(true);
+      });
   }, []);
 
   const pastPapers = useMemo(
@@ -220,7 +227,7 @@ export default function App() {
     );
   }
 
-  if (!questions.length) {
+  if (!questionsLoaded) {
     if (boardScreens.includes(screen)) {
       return (
         <AppShell

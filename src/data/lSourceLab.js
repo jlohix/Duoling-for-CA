@@ -21,6 +21,16 @@ export const LSOURCE_DRAG = [
     why: "$I_0=0$, so $i(\\tau)=(V_s/R)(1-1/e)\\approx 2\\times 0.632\\approx 1.26\\,\\mathrm{A}$. $0.74\\,\\mathrm{A}$ is $2/e$, the source-free leftover. $2\\,\\mathrm{A}$ is $i(\\infty)$, not $i(\\tau)$.",
   },
   {
+    id: "tau-6m-3",
+    kind: "tau",
+    lLabel: "6 mH",
+    rLabel: "3 Ω",
+    correct: 2,
+    choices: [2, 6, 9, 18],
+    unit: "ms",
+    why: "$\\tau=L/R=6\\times 10^{-3}/3=2\\,\\mathrm{ms}$. $18$ is $L\\times R$ with a unit slip.",
+  },
+  {
     id: "i-inf",
     kind: "iinf",
     vs: 12,

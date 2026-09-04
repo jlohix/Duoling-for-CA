@@ -19,6 +19,16 @@ export const FREEC_DRAG = [
     why: "At $t=\\tau$, $v=v(0)/e\\approx 3.7\\,\\mathrm{V}$. $6.3\\,\\mathrm{V}$ is $10(1-1/e)$. $5\\,\\mathrm{V}$ is a guessed half. $1.4\\,\\mathrm{V}$ is $10e^{-2}$ (two time constants).",
   },
   {
+    id: "tau-1k-5u",
+    kind: "tau",
+    rLabel: "1 kΩ",
+    cLabel: "5 μF",
+    correct: 5,
+    choices: [1, 5, 6, 20],
+    unit: "ms",
+    why: "$\\tau=RC=1\\times 10^3\\times 5\\times 10^{-6}=5\\,\\mathrm{ms}$.",
+  },
+  {
     id: "v-inf",
     kind: "vinf",
     v0: 10,

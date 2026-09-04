@@ -2519,6 +2519,11 @@ html[data-theme="dark"] .labs-egg-b {
   background: transparent;
 }
 
+.resistor-slot.compact {
+  font-size: 12px;
+  border-radius: 6px;
+}
+
 .resistor-slot.hot {
   border-style: solid;
   color: var(--ink);

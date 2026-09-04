@@ -18,6 +18,15 @@ export const INDUCTOR_DRAG = [
     why: "Parallel: $1/L_{eq}=1/3+1/6=1/2$, so $L_{eq}=2\\,\\mathrm{mH}$.",
   },
   {
+    id: "series-2-6",
+    kind: "series",
+    l1: 2,
+    l2: 6,
+    correct: 8,
+    choices: [3, 4, 8, 12],
+    why: "Series: $L_{eq}=2+6=8\\,\\mathrm{mH}$. $12$ is a guessed product. $3$ is not $1/L$ parallel.",
+  },
+  {
     id: "tpos-i",
     kind: "tpos",
     volts: 10,
