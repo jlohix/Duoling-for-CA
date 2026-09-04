@@ -1,0 +1,44 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  font-family: system-ui, sans-serif;
+  background: #f7f7f7;
+}
+
+.demo {
+  text-align: center;
+}
+
+.mascot-stage {
+  width: min(520px, 95vw);
+  height: min(640px, 117vw);
+  display: grid;
+  place-items: end center;
+}
+
+#batMascot {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+button {
+  margin-top: 12px;
+  padding: 11px 20px;
+  border: 0;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  background: #222;
+  color: #fff;
+}
