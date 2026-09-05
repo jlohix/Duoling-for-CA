@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import MathText from "./MathText";
+import QuizMascot from "./QuizMascot";
 
 const LABELS = ["A", "B", "C", "D"];
 const KEYS = ["a", "b", "c", "d"];
@@ -167,6 +168,7 @@ export function QuickCheckCard({
         </button>
       ) : (
         <div className={`qc-feedback ${ok ? "ok" : "bad"}`}>
+          <QuizMascot mood={ok ? "happy" : "scary"} playKey={ok ? "ok" : "bad"} />
           <p className={ok ? "ok-text" : "bad-text"}>
             <span className="qc-result">{ok ? "Nice!" : "Not quite"}</span>
             <MathText text={why} />

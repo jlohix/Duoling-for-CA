@@ -1,5 +1,17 @@
 export const BUILT_IN_LOGS = [
   {
+    id: "built-2026-09-05-sunwoo-mascots",
+    date: "2026-09-05",
+    title: "Sunwoo reacts to checks",
+    body: "A correct check plays happy Sunwoo’s celebration. A miss plays scary Sunwoo’s bat swing. Only one frame shows at a time.",
+  },
+  {
+    id: "built-2026-09-04-updates-preview",
+    date: "2026-09-04",
+    title: "Updates shows the latest five",
+    body: "Updates now lists the five newest notes first. Tap Show older updates if you want the rest.",
+  },
+  {
     id: "built-2026-09-04-empty-bank-loads",
     date: "2026-09-04",
     title: "Learn opens without quizzes",

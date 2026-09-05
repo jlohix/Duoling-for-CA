@@ -6,11 +6,17 @@ import {
   removeChangeLog,
 } from "../state/changelog";
 
+const PREVIEW = 5;
+
 export default function Updates({ canEdit = false }) {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [date, setDate] = useState(() => todayKey());
   const [logs, setLogs] = useState(() => listChangeLogs());
+  const [expanded, setExpanded] = useState(false);
+
+  const visible = expanded ? logs : logs.slice(0, PREVIEW);
+  const hiddenCount = Math.max(0, logs.length - PREVIEW);
 
   function submit(event) {
     event.preventDefault();
@@ -20,6 +26,7 @@ export default function Updates({ canEdit = false }) {
     setTitle("");
     setBody("");
     setDate(todayKey());
+    setExpanded(false);
   }
 
   function remove(id) {
@@ -77,7 +84,7 @@ export default function Updates({ canEdit = false }) {
       ) : null}
 
       <ol className="change-log">
-        {logs.map((entry) => (
+        {visible.map((entry) => (
           <li key={entry.id} className="profile-block change-item">
             <div className="change-head">
               <p className="eyebrow">{entry.date}</p>
@@ -100,7 +107,17 @@ export default function Updates({ canEdit = false }) {
           </li>
         ))}
       </ol>
+      {hiddenCount > 0 ? (
+        <button
+          type="button"
+          className="ghost change-more"
+          onClick={() => setExpanded((open) => !open)}
+        >
+          {expanded
+            ? "Show latest 5"
+            : `Show ${hiddenCount} older ${hiddenCount === 1 ? "update" : "updates"}`}
+        </button>
+      ) : null}
     </div>
   );
 }
-

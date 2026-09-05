@@ -1,4 +1,5 @@
 import MathText from "./MathText";
+import QuizMascot from "./QuizMascot";
 
 export default function FeedbackBanner({
   correct,
@@ -10,6 +11,7 @@ export default function FeedbackBanner({
   return (
     <div className={`feedback ${correct ? "ok" : "bad"}`}>
       <div>
+        <QuizMascot mood={correct ? "happy" : "scary"} playKey={correct ? "ok" : "bad"} />
         <strong>{correct ? "Correct" : "Not quite"}</strong>
         {failOut ? (
           <p>
