@@ -964,6 +964,83 @@ html[data-theme="dark"] [data-tier="obsidian"] { color: #9aa3af; --tier: #9aa3af
   font-size: 1.1rem;
 }
 
+.hex-stats {
+  margin: 0;
+}
+
+.hex-stats-svg {
+  display: block;
+  width: min(360px, 100%);
+  height: auto;
+  margin: 0 auto;
+}
+
+.hex-ring {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ink) 38%, var(--line));
+  stroke-width: 1.75;
+}
+
+html[data-theme="dark"] .hex-ring {
+  stroke: color-mix(in srgb, var(--ink) 48%, transparent);
+}
+
+.hex-ring.solid-ring {
+  stroke: color-mix(in srgb, var(--muted) 70%, var(--ink));
+}
+
+.hex-ring.strength-ring {
+  stroke: color-mix(in srgb, var(--green) 75%, #fff);
+  stroke-width: 2.2;
+}
+
+.hex-spoke {
+  stroke: color-mix(in srgb, var(--ink) 28%, var(--line));
+  stroke-width: 1.25;
+}
+
+html[data-theme="dark"] .hex-spoke {
+  stroke: color-mix(in srgb, var(--ink) 36%, transparent);
+}
+
+.hex-fill {
+  fill: color-mix(in srgb, var(--green) 32%, transparent);
+  stroke: var(--green);
+  stroke-width: 2;
+}
+
+.hex-dot {
+  fill: var(--muted);
+  stroke: var(--card);
+  stroke-width: 2;
+}
+
+.hex-dot.strength {
+  fill: var(--green);
+}
+
+.hex-dot.weakness {
+  fill: var(--red);
+}
+
+.hex-dot.solid,
+.hex-dot.starting {
+  fill: var(--xp);
+}
+
+.hex-label {
+  fill: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hex-stats-key {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  text-align: center;
+}
+
 .strengths-card {
   border-color: var(--green);
 }

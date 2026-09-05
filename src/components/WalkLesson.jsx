@@ -1,9 +1,11 @@
-import { useMemo, useState } from "react";
+import { useRef, useState } from "react";
 import MathText from "./MathText";
 import ThemeSwitch from "./ThemeSwitch";
 import LabTeach from "./LabTeach";
 import ValueDragLab from "./ValueDragLab";
+import ReviewGate from "./ReviewGate";
 import { InlineKnowledgeCheck } from "./QuickCheck";
+import { finishGuidedLesson, payGuidedCheck } from "../state/progress";
 
 function resolvePracticeView(question, lab, practiceView) {
   if (!question || question.hideBoard) return null;
@@ -15,15 +17,20 @@ function resolvePracticeView(question, lab, practiceView) {
   return step?.view || null;
 }
 
-function PracticeView({ title, progressLabel, practice, Schematic, boardHint, practiceView, lab, lastLabel = "See score", onExit, onDone }) {
-  const queue = useMemo(() => practice, [practice]);
+function PracticeView({ title, progressLabel, practice, Schematic, boardHint, practiceView, lab, lastLabel = "See score", onExit, onDone, onCheck }) {
+  const originalTotal = practice.length;
+  const [queue, setQueue] = useState(practice);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState("");
   const [revealed, setRevealed] = useState(false);
   const [ok, setOk] = useState(false);
-  const [score, setScore] = useState(0);
+  const [firstPass, setFirstPass] = useState(0);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewCount, setReviewCount] = useState(0);
+  const attemptedRef = useRef(new Set());
   const question = queue[index];
-  const last = index + 1 >= queue.length;
+  const last = revealed && ok && index + 1 >= queue.length;
+  const willRepeat = revealed && !ok && index < originalTotal;
   const boardView = resolvePracticeView(question, lab, practiceView);
   const boardHighlight = question?.highlight || "all";
   const hint =
@@ -38,20 +45,32 @@ function PracticeView({ title, progressLabel, practice, Schematic, boardHint, pr
   function check() {
     if (!question || !selected || revealed) return;
     const pass = selected === question.answer;
+    const checkId = question.id || `p-${index}`;
+    const firstTry = !attemptedRef.current.has(checkId);
+    attemptedRef.current.add(checkId);
     setOk(pass);
     setRevealed(true);
+    if (firstTry && pass) setFirstPass((n) => n + 1);
+    onCheck?.({ ok: pass, firstTry, id: checkId });
   }
 
   function next() {
     if (!revealed) return;
-    const nextScore = score + (ok ? 1 : 0);
-    if (last) {
-      onDone(nextScore, queue.length);
+    const nextQueue = ok ? queue : [...queue, question];
+    if (!ok) setQueue(nextQueue);
+    if (index + 1 >= nextQueue.length) {
+      onDone(firstPass, originalTotal);
       return;
     }
-    setScore(nextScore);
-    setIndex((n) => n + 1);
+    const enteringReview =
+      index + 1 === originalTotal && nextQueue.length > originalTotal;
     reset();
+    if (enteringReview) {
+      setReviewCount(nextQueue.length - originalTotal);
+      setReviewOpen(true);
+      return;
+    }
+    setIndex((n) => n + 1);
   }
 
   return (
@@ -66,35 +85,60 @@ function PracticeView({ title, progressLabel, practice, Schematic, boardHint, pr
         </p>
         <ThemeSwitch compact />
       </header>
-      {boardView ? (
-        <div className="circuit-board">
-          <Schematic highlight={boardHighlight} view={boardView} />
-          {hint ? <p className="circuit-dot-key">{hint}</p> : null}
-        </div>
-      ) : null}
-      <section className="teach-card">
-        <InlineKnowledgeCheck
-          badge="Try a few"
-          check={question}
-          lockKey={question.id}
-          selected={selected}
-          revealed={revealed}
-          ok={ok}
-          onSelect={setSelected}
-          onCheck={check}
-          progressLabel={`${index + 1} of ${queue.length}`}
-          afterReveal={
-            <button type="button" className="primary qc-next" onClick={next}>
-              {last ? lastLabel : "Next"}
-            </button>
-          }
+      {reviewOpen ? (
+        <ReviewGate
+          count={reviewCount}
+          onContinue={() => {
+            setReviewOpen(false);
+            setIndex((n) => n + 1);
+          }}
         />
-      </section>
+      ) : (
+        <>
+          {boardView ? (
+            <div className="circuit-board">
+              <Schematic highlight={boardHighlight} view={boardView} />
+              {hint ? <p className="circuit-dot-key">{hint}</p> : null}
+            </div>
+          ) : null}
+          <section className="teach-card">
+            <InlineKnowledgeCheck
+              badge="Try a few"
+              check={question}
+              lockKey={`${question.id}-${index}`}
+              selected={selected}
+              revealed={revealed}
+              ok={ok}
+              onSelect={setSelected}
+              onCheck={check}
+              willRepeat={willRepeat}
+              progressLabel={`${index + 1} of ${queue.length}`}
+              afterReveal={
+                <button type="button" className="primary qc-next" onClick={next}>
+                  {last ? lastLabel : "Next"}
+                </button>
+              }
+            />
+          </section>
+        </>
+      )}
     </div>
   );
 }
 
-export default function WalkLesson({ labId, catalog, Schematic, onExit, onContinue }) {
+export default function WalkLesson({
+  labId,
+  catalog,
+  Schematic,
+  onExit,
+  onContinue,
+  topicId,
+  preview = false,
+  progress,
+  setProgress,
+  walkKey,
+  onFinished,
+}) {
   const lab = catalog.getLab(labId);
   const next = catalog.getNext(labId);
   const part = Math.max(1, catalog.labs.findIndex((item) => item.id === lab.id) + 1);
@@ -103,10 +147,49 @@ export default function WalkLesson({ labId, catalog, Schematic, onExit, onContin
   const hasDrag = Boolean(lab.drag?.length && lab.DragBoard);
   const [stage, setStage] = useState("teach");
   const [score, setScore] = useState(null);
+  const paidRef = useRef(new Set());
+  const xpRef = useRef(0);
+
+  function payCheck(outcome) {
+    payGuidedCheck(setProgress, {
+      preview,
+      xpEach: 0,
+      topicId,
+      paidRef,
+      xpRef,
+      ...outcome,
+    });
+  }
+
+  function finishWalk(nextScore) {
+    setScore(nextScore);
+    if (walkKey && onFinished) {
+      finishGuidedLesson({
+        preview,
+        progress,
+        setProgress,
+        key: walkKey,
+        xpFromChecks: xpRef.current,
+        correct: (nextScore.ok || 0) + (nextScore.dragOk || 0),
+        total: (nextScore.total || 0) + (nextScore.dragTotal || 0),
+        topicName: lab.title,
+        difficultyName: "Walkthrough",
+        kind: "walk",
+        onFinished,
+      });
+      return;
+    }
+    setStage("done");
+  }
 
   function afterPractice(ok, total) {
-    setScore({ ok, total });
-    setStage(hasDrag ? "drag" : "done");
+    const nextScore = { ok, total };
+    if (hasDrag) {
+      setScore(nextScore);
+      setStage("drag");
+      return;
+    }
+    finishWalk(nextScore);
   }
 
   if (stage === "done" && score) {
@@ -169,13 +252,13 @@ export default function WalkLesson({ labId, catalog, Schematic, onExit, onContin
         labelFor={lab.dragLabel}
         hint={lab.dragHint}
         onExit={onExit}
+        onCheck={payCheck}
         onDone={(ok, total) => {
-          setScore((prev) => ({
-            ...(prev || {}),
+          finishWalk({
+            ...(score || {}),
             dragOk: ok,
             dragTotal: total,
-          }));
-          setStage("done");
+          });
         }}
       />
     );
@@ -193,6 +276,7 @@ export default function WalkLesson({ labId, catalog, Schematic, onExit, onContin
         lab={lab}
         lastLabel={hasDrag ? "Drag values" : "See score"}
         onExit={onExit}
+        onCheck={payCheck}
         onDone={afterPractice}
       />
     );
@@ -214,6 +298,7 @@ export default function WalkLesson({ labId, catalog, Schematic, onExit, onContin
             : "Skip walkthrough"
       }
       onExit={onExit}
+      onCheck={payCheck}
       onPractice={() => setStage(hasPractice ? "practice" : hasDrag ? "drag" : "done")}
     />
   );

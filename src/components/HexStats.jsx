@@ -102,8 +102,9 @@ export default function HexStats({ topics, progress }) {
         })}
       </svg>
       <figcaption className="hex-stats-key">
-        Outer ring is 100% first try. Green dots are strengths (80%+). Red dots
-        are weaknesses (under 60%). Empty topics sit at the centre.
+        Outer ring is 100% first try on lessons and walkthroughs. Green dots
+        are strengths (80%+). Red dots are weaknesses (under 60%). Empty
+        topics sit at the centre.
       </figcaption>
     </figure>
   );

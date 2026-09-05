@@ -3,6 +3,7 @@ import { walkLessonKey } from "../state/progress";
 const SECTION1 = [
   ["walk-lab-ohm", "R = V/I"],
   ["walk-lab-dividers", "Dividers"],
+  ["walk-lab-branches", "Branch dividers"],
   ["walk-lab-power", "Power"],
   ["walk-lab-maxpower", "Max power"],
   ["walk-lab-nodal", "Nodal"],

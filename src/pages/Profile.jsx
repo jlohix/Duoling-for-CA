@@ -58,8 +58,8 @@ export default function Profile({ user, topics, progress, setProgress, onPractic
         onPractice={onPractice}
       />
       <p className="focus-line">
-        Strengths and weaknesses use first-try accuracy. A topic needs at least
-        3 answers before it is labeled.
+        Strengths and weaknesses use first-try accuracy on lessons and
+        walkthroughs. A topic needs at least 3 answers before it is labeled.
       </p>
 
       <section className="profile-card hex-stats-card">

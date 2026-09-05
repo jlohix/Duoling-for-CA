@@ -154,6 +154,11 @@ function LawsLabs({ unlocked, labs }) {
         <span className="node-name">Dividers</span>
         <span className="node-count">V and I</span>
       </button>
+      <button type="button" className={`node ${off}`} disabled={!unlocked} onClick={labs.onBranchLab}>
+        <span className="node-icon">÷∥</span>
+        <span className="node-name">Branch dividers</span>
+        <span className="node-count">10 Qs</span>
+      </button>
       <button type="button" className={`node ${off}`} disabled={!unlocked} onClick={labs.onPowerLab}>
         <span className="node-icon">P</span>
         <span className="node-name">Power</span>
@@ -375,6 +380,7 @@ export default function Home({
   onSuperNodeLab,
   onSuperposLab,
   onDividerLab,
+  onBranchLab,
   onPowerLab,
   onMaxPowerLab,
   onDcLab,
@@ -524,6 +530,7 @@ export default function Home({
             labs={{
               onLab,
               onDividerLab,
+              onBranchLab,
               onPowerLab,
               onMaxPowerLab,
               onThevLab,

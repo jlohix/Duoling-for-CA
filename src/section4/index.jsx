@@ -51,14 +51,17 @@ export const SECTION4_LABS = [
 
 export const section4Catalog = makeCatalog("First-order circuits", SECTION4_LABS);
 
-export default function Section4Lesson({ labId, onExit, onContinue }) {
+export default function Section4Lesson({ labId, onExit, onContinue, ...rest }) {
   return (
     <WalkLesson
       labId={labId}
       catalog={section4Catalog}
       Schematic={Section4Schematic}
+      topicId={4}
+      section={4}
       onExit={onExit}
       onContinue={onContinue}
+      {...rest}
     />
   );
 }

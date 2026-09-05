@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import MathText from "./MathText";
 import ThemeSwitch from "./ThemeSwitch";
+import ReviewGate from "./ReviewGate";
 
 function shuffle(list) {
   const next = [...list];
@@ -24,21 +25,25 @@ export default function ValueDragLab({
   onCheck,
   onDone,
 }) {
-  const queue = useMemo(() => shuffle(questions), [questions]);
+  const originalTotal = questions.length;
+  const [queue, setQueue] = useState(() => shuffle(questions));
   const [index, setIndex] = useState(0);
   const [placed, setPlaced] = useState(null);
   const [revealed, setRevealed] = useState(false);
   const [ok, setOk] = useState(false);
-  const [score, setScore] = useState(0);
+  const [firstPass, setFirstPass] = useState(0);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewCount, setReviewCount] = useState(0);
   const [drag, setDrag] = useState(null);
   const slotRef = useRef(null);
   const dragRef = useRef(null);
   const attemptedRef = useRef(new Set());
   const question = queue[index];
-  const last = index + 1 >= queue.length;
+  const last = revealed && ok && index + 1 >= queue.length;
+  const willRepeat = revealed && !ok && index < originalTotal;
   const choices = useMemo(
     () => shuffle(question?.choices || []),
-    [question?.id]
+    [question?.id, index]
   );
 
   function resetPlace() {
@@ -100,19 +105,27 @@ export default function ValueDragLab({
     attemptedRef.current.add(checkId);
     setOk(pass);
     setRevealed(true);
+    if (firstTry && pass) setFirstPass((n) => n + 1);
     onCheck?.({ ok: pass, firstTry, id: `drag-${checkId}` });
   }
 
   function next() {
     if (!revealed) return;
-    const nextScore = score + (ok ? 1 : 0);
-    if (last) {
-      onDone(nextScore, queue.length);
+    const nextQueue = ok ? queue : [...queue, question];
+    if (!ok) setQueue(nextQueue);
+    if (index + 1 >= nextQueue.length) {
+      onDone(firstPass, originalTotal);
       return;
     }
-    setScore(nextScore);
-    setIndex((n) => n + 1);
+    const enteringReview =
+      index + 1 === originalTotal && nextQueue.length > originalTotal;
     resetPlace();
+    if (enteringReview) {
+      setReviewCount(nextQueue.length - originalTotal);
+      setReviewOpen(true);
+      return;
+    }
+    setIndex((n) => n + 1);
   }
 
   if (!question) return null;
@@ -135,6 +148,16 @@ export default function ValueDragLab({
         </p>
         <ThemeSwitch compact />
       </header>
+      {reviewOpen ? (
+        <ReviewGate
+          count={reviewCount}
+          onContinue={() => {
+            setReviewOpen(false);
+            setIndex((n) => n + 1);
+          }}
+        />
+      ) : (
+        <>
       <p className="focus-line">
         <MathText text={promptFor(question)} />
       </p>
@@ -184,10 +207,15 @@ export default function ValueDragLab({
               text={`${ok ? "Correct. " : "Not that value. "}${question.why}`}
             />
           </p>
+          {willRepeat ? (
+            <p className="login-hint">This question will come back at the end.</p>
+          ) : null}
           <button type="button" className="primary" onClick={next}>
             {last ? "See score" : "Next"}
           </button>
         </div>
+      )}
+        </>
       )}
       {drag ? (
         <div

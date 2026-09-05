@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import MathText from "./MathText";
 import ThemeSwitch from "./ThemeSwitch";
 import { InlineKnowledgeCheck } from "./QuickCheck";
@@ -53,11 +53,13 @@ export default function LabTeach({
   onExit,
   onPractice,
   onChain,
+  onCheck,
 }) {
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState("");
   const [revealed, setRevealed] = useState(false);
   const [ok, setOk] = useState(false);
+  const attemptedRef = useRef(new Set());
   const step = steps[index];
   const last = index >= steps.length - 1;
   const needsCheck = Boolean(step.check);
@@ -72,8 +74,12 @@ export default function LabTeach({
   function check() {
     if (!step.check || !selected || revealed) return;
     const pass = selected === step.check.answer;
+    const checkId = step.id || `step-${index}`;
+    const firstTry = !attemptedRef.current.has(checkId);
+    attemptedRef.current.add(checkId);
     setOk(pass);
     setRevealed(true);
+    onCheck?.({ ok: pass, firstTry, id: checkId });
   }
 
   function next() {

@@ -191,15 +191,16 @@ export function topicInsight(progress, topicId) {
   const correct = Number(stats?.correct) || 0;
   const attempts = Number(stats?.attempts) || 0;
   if (!attempts) {
-    const practiced = (progress.completed || []).some((key) =>
-      String(key).startsWith(`${topicId}-`)
-    );
+    const practiced = (progress.completed || []).some((key) => {
+      const id = String(key);
+      return id.startsWith(`${topicId}-`) || id.startsWith(`walk-${topicId}-`);
+    });
     return {
       kind: "empty",
       label: practiced ? "No accuracy yet" : "Not practiced",
       detail: practiced
-        ? "Replay a lesson to measure first-try accuracy."
-        : "Answer questions to measure this topic.",
+        ? "Replay a lesson or walkthrough to measure first-try accuracy."
+        : "Answer lesson or walkthrough questions to measure this topic.",
       pct: null,
       correct: 0,
       attempts: 0,

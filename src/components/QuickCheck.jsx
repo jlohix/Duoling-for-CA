@@ -121,6 +121,7 @@ export function QuickCheckCard({
   afterReveal,
   badge = "Quick check",
   progressLabel,
+  willRepeat = false,
 }) {
   return (
     <div className={`qc-card ${revealed ? (ok ? "is-ok" : "is-bad") : ""}`.trim()}>
@@ -173,6 +174,9 @@ export function QuickCheckCard({
             <span className="qc-result">{ok ? "Nice!" : "Not quite"}</span>
             <MathText text={why} />
           </p>
+          {!ok && willRepeat ? (
+            <p className="login-hint">This question will come back at the end.</p>
+          ) : null}
           <div className="qc-feedback-actions">
             {!ok && onRetry ? (
               <button type="button" className="ghost" onClick={onRetry}>
@@ -199,6 +203,7 @@ export function InlineKnowledgeCheck({
   badge,
   progressLabel,
   lockKey,
+  willRepeat = false,
 }) {
   const layout = useLockedChoiceLayout(check, lockKey);
   if (!check) return null;
@@ -217,6 +222,7 @@ export function InlineKnowledgeCheck({
       afterReveal={afterReveal}
       badge={badge}
       progressLabel={progressLabel}
+      willRepeat={willRepeat}
     />
   );
 }

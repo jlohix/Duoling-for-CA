@@ -22,6 +22,7 @@ import SuperMeshSchematic from "./components/SuperMeshSchematic";
 import SuperNodeSchematic from "./components/SuperNodeSchematic";
 import SuperpositionSchematic from "./components/SuperpositionSchematic";
 import DividerSchematic from "./components/DividerSchematic";
+import DividerBranchesLesson from "./pages/DividerBranchesLesson";
 import PowerSchematic from "./components/PowerSchematic";
 import MaxPowerSchematic from "./components/MaxPowerSchematic";
 import { loadProgress } from "./state/progress";
@@ -123,6 +124,7 @@ export default function App() {
       "dragsnlab",
       "dragsuperposlab",
       "dragdivlab",
+      "dragbranchlab",
       "dragpowerlab",
       "dragmptlab",
       "dragdclab",
@@ -438,6 +440,16 @@ export default function App() {
     );
   }
 
+  if (screen === "dragbranchlab") {
+    return (
+      <DividerBranchesLesson
+        {...labXp}
+        walkKey="walk-lab-branches"
+        topicId={1}
+      />
+    );
+  }
+
   if (screen === "dragpowerlab") {
     return (
       <DragCircuitLab
@@ -618,6 +630,7 @@ export default function App() {
       onSuperNodeLab={() => setScreen("dragsnlab")}
       onSuperposLab={() => setScreen("dragsuperposlab")}
       onDividerLab={() => setScreen("dragdivlab")}
+      onBranchLab={() => setScreen("dragbranchlab")}
       onPowerLab={() => setScreen("dragpowerlab")}
       onMaxPowerLab={() => setScreen("dragmptlab")}
       onDcLab={() => setScreen("dragdclab")}

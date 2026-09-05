@@ -21,7 +21,7 @@ const STEPS = [
   },
   {
     title: "Profile and Progress",
-    text: "Profile lists strengths (about 80%+ first try) and weaknesses (under 60%) after at least 3 answers, plus a hex chart of first-try accuracy on every topic. Progress shows the same hex for that student, every topic, and your strongest / focus area.",
+    text: "Profile lists strengths (about 80%+ first try) and weaknesses (under 60%) after at least 3 answers from lessons and walkthroughs, plus a hex chart of first-try accuracy on every topic. Progress shows the same hex for that student, every topic, and your strongest / focus area.",
   },
   {
     title: "Trophy leagues",

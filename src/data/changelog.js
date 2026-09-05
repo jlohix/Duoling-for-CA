@@ -1,5 +1,29 @@
 export const BUILT_IN_LOGS = [
   {
+    id: "built-2026-09-06-lab-missed-return",
+    date: "2026-09-06",
+    title: "Missed lab questions return",
+    body: "After a walkthrough, a missed quiz or drag question comes back at the end so you can try it again. Your first-try score is the one that counts.",
+  },
+  {
+    id: "built-2026-09-06-branch-dividers",
+    date: "2026-09-06",
+    title: "Branch divider questions",
+    body: "Basic laws now has Branch dividers between Dividers and Power. Five schematic quizzes and five drag questions use two or three parallel branches.",
+  },
+  {
+    id: "built-2026-09-05-walk-strengths",
+    date: "2026-09-05",
+    title: "Walkthroughs count on Profile",
+    body: "First-try checks in walkthroughs now count toward strengths, weaknesses, and the topic hex, same as lesson questions.",
+  },
+  {
+    id: "built-2026-09-05-hex-rings",
+    date: "2026-09-05",
+    title: "Topic hex easier to read",
+    body: "The rings on the Profile and Progress hex chart are lighter now, so the 60% and 80% guides stay visible in dark mode.",
+  },
+  {
     id: "built-2026-09-05-sunwoo-mascots",
     date: "2026-09-05",
     title: "Sunwoo reacts to checks",
